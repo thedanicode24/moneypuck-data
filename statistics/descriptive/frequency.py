@@ -76,7 +76,6 @@ def print_frequencies(df):
     for x, freq in ftab.items():
         print(x, freq)
 
-    
 def plots_two_ftab(
         df1, df2, 
         xlim=[20,50], 
@@ -85,7 +84,8 @@ def plots_two_ftab(
         name1="first", 
         name2="others", 
         xlabel="Value", 
-        ylabel="Frequency"):
+        ylabel="Frequency"
+        ):
     """
     Plot two frequency tables side-by-side for comparison.
 
