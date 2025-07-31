@@ -1,164 +1,186 @@
-import altair as alt
-import pandas as pd
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def create_interactive_scatter(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    category: str,
-    filter_col: str,
-    tooltip_cols: list,
-    title: str = '',
-    default_filter_value: str = None,
-    point_size: int = 60,
-    width: int = 600,
-    height: int = 400
+def save_histogram(
+    df,
+    column,
+    output_dir,
+    filename_prefix,
+    title='Histogram',
+    xlabel='Value',
+    ylabel='Frequency',
+    bins=30,
+    kde=True, 
+    color='skyblue'
 ):
     """
-    Create an interactive scatter plot using Altair with a dropdown filter.
+    Create and save a histogram from a specified column in a DataFrame.
 
-    Args:
-        df (pd.DataFrame): The input DataFrame containing the data to plot.
-        x (str): Column name to use for the x-axis.
-        y (str): Column name to use for the y-axis.
-        category (str): Column name to use for color encoding (categorical variable).
-        filter_col (str): Column name to use for dropdown filtering.
-        tooltip_cols (list): List of column names to show in tooltips on hover.
-        title (str, optional): Title of the chart. Defaults to ''.
-        default_filter_value (str, optional): Default selected value in the dropdown. 
-            If None, the first unique value of the filter_col is used.
-        point_size (int, optional): Size of the scatter plot points. Defaults: 60.
-        width (int, optional): Width of the chart in pixels. Defaults: 600.
-        height (int, optional): Height of the chart in pixels. Defaults: 400.
-
-    Returns:
-        alt.Chart: An Altair Chart object representing the interactive scatter plot.
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The DataFrame containing the data.
+    column : str
+        Name of the column to plot.
+    output_dir : str
+        Path to the directory where the histogram image will be saved.
+    filename_prefix : str
+        Prefix for the saved file name.
+    title : str, optional
+        Title of the plot. Default is 'Histogram'.
+    xlabel : str, optional
+        Label for the x-axis. Default is 'Value'.
+    ylabel : str, optional
+        Label for the y-axis. Default is 'Frequency'.
+    bins : int, optional
+        Number of histogram bins. Default is 30.
+    kde : bool, optional
+        Whether to include KDE curve. Default is True.
+    color : str, optional
+        Color for the histogram bars (e.g., 'blue', '#1f77b4', 'skyblue'). Default is 'skyblue'.
     """
 
-    options = df[filter_col].unique().tolist()
-    
-    if default_filter_value is None:
-        default_filter_value = options[0]
+    os.makedirs(output_dir, exist_ok=True)
 
-    dropdown = alt.binding_select(options=options, name=f'{filter_col}: ')
-    param = alt.param(name=f'{filter_col}_param', bind=dropdown, value=default_filter_value)
-
-    chart = alt.Chart(df).mark_circle(size=point_size).encode(
-        x=x,
-        y=y,
-        color=category,
-        tooltip=tooltip_cols
-    ).add_params(
-        param
-    ).transform_filter(
-        f'datum.{filter_col} == {filter_col}_param'
-    ).properties(
-        title=title,
-        width=width,
-        height=height
-    )
-
-    return chart
-
-
-def create_interactive_boxplot(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    filter_col: str,
-    title: str = '',
-    default_filter_value: str = None,
-    width: int = 600,
-    height: int = 400
-):
-    """
-    Create an interactive boxplot with a dropdown filter using Altair.
-
-    Args:
-        df (pd.DataFrame): The input DataFrame containing the data to visualize.
-        x (str): Column name to use for the x-axis (typically a categorical variable).
-        y (str): Column name to use for the y-axis (typically numeric).
-        filter_col (str): Column used to filter the data via dropdown menu.
-        title (str, optional): Title of the chart. Defaults to ''.
-        default_filter_value (str, optional): Default selected value in the dropdown.
-            If None, the first unique value of filter_col is used.
-        width (int, optional): Width of the chart in pixels. Defaults to 600.
-        height (int, optional): Height of the chart in pixels. Defaults to 400.
-
-    Returns:
-        alt.Chart: An Altair Chart object representing the interactive boxplot.
-    """
-
-    options = df[filter_col].unique().tolist()
-    if default_filter_value is None:
-        default_filter_value = options[0]
-
-    dropdown = alt.binding_select(options=options, name=f'{filter_col}: ')
-    param = alt.param(name=f'{filter_col}_param', bind=dropdown, value=default_filter_value)
-
-    chart = alt.Chart(df).mark_boxplot().encode(
-        x=x,
-        y=y
-    ).add_params(
-        param
-    ).transform_filter(
-        f'datum.{filter_col} == {filter_col}_param'
-    ).properties(
-        title=title,
-        width=width,
-        height=height
-    )
-
-    return chart
-
-def plot_histograms_by_group(
-    df: pd.DataFrame,
-    group_col: str,
-    hist_col: str,
-    derived_cols_funcs: dict = None,
-    bins: int = 30,
-    figsize_per_plot: tuple = (6,5),
-    kde: bool = True
-):
-    """
-    Plot histograms of a specified column grouped by unique values in another column.
-
-    Args:
-        df (pandas.DataFrame): The dataframe containing the data.
-        group_col (str): The column name to group by.
-        hist_col (str): The numeric column to plot histogram of.
-        derived_cols_funcs (dict, optional): 
-            Dictionary where keys are new column names and values are functions
-            that take df and return a Series to be added to df. Default is None.
-        bins (int, optional): Number of bins for the histogram. Default is 30.
-        figsize_per_plot (tuple, optional):
-            Width and height per subplot in inches. Default is (6, 5).
-        kde (bool, optional): Whether to show KDE curve. Default is True.
-
-    Returns: 
-        None: Displays the plot.
-    """
-    if derived_cols_funcs:
-        for new_col, func in derived_cols_funcs.items():
-            df[new_col] = func(df)
-
-    groups = df[group_col].unique().tolist()
-    n = len(groups)
-
-    fig, axes = plt.subplots(nrows=n, ncols=1, figsize=(figsize_per_plot[0], figsize_per_plot[1]*n))
-    plt.subplots_adjust(hspace=0.4)
-
-    if n==1:
-        axes = [axes]
-
-    for ax, group in zip(axes, groups):
-        df_g = df[df[group_col] == group]
-        sns.histplot(df_g[hist_col], bins=bins, kde=kde, ax=ax)
-        ax.set_title(f"Distribution {hist_col} - {group_col}: {group}")
-        ax.set_xlabel(hist_col)
-        ax.set_ylabel("Count")
-
+    plt.figure(figsize=(8, 5))
+    sns.histplot(df[column], bins=bins, kde=kde, color=color)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.tight_layout()
-    plt.show()
+
+    filename = f"{filename_prefix}_{column}.png"
+    filepath = os.path.join(output_dir, filename)
+    plt.savefig(filepath)
+    plt.close()
+
+
+def save_boxplot(
+    df,
+    x_column,
+    y_column,
+    output_dir,
+    filename_prefix,
+    title='Boxplot',
+    xlabel='X',
+    ylabel='Y',
+    order=None,
+    palette=None
+):
+    """
+    Create and save a boxplot from specified columns in a DataFrame.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The DataFrame containing the data.
+    x_column : str
+        Column name for the x-axis categories.
+    y_column : str
+        Column name for the numeric y-axis values.
+    output_dir : str
+        Directory path to save the plot image.
+    filename_prefix : str
+        Prefix for the saved file name.
+    title : str, optional
+        Title of the plot. Default is 'Boxplot'.
+    xlabel : str, optional
+        Label for the x-axis. Default is 'X'.
+    ylabel : str, optional
+        Label for the y-axis. Default is 'Y'.
+    order : list, optional
+        Order of categories on the x-axis.
+    palette : dict or list, optional
+        Colors for the boxes (used with hue).
+
+    Returns:
+    --------
+    None
+    """
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    plt.figure(figsize=(10, 6))
+
+    sns.boxplot(
+        data=df,
+        x=x_column,
+        y=y_column,
+        hue=x_column,
+        order=order,
+        palette=palette,
+        dodge=False,
+        legend=False
+    )
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.tight_layout()
+
+    filename = f"{filename_prefix}_{y_column}_by_{x_column}.png"
+    filepath = os.path.join(output_dir, filename)
+    plt.savefig(filepath)
+    plt.close()
+
+def save_scatterplot(
+    df,
+    x_column,
+    y_column,
+    hue_column,
+    output_dir,
+    filename_prefix,
+    title='Scatterplot',
+    xlabel='X-axis',
+    ylabel='Y-axis',
+    palette=None,
+    legend=True
+):
+    """
+    Create and save a scatter plot using seaborn.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing the data to plot.
+    x_column : str
+        Column name for x-axis values.
+    y_column : str
+        Column name for y-axis values.
+    hue_column : str
+        Column name for color grouping (e.g. position).
+    output_dir : str
+        Path to the directory to save the plot.
+    filename_prefix : str
+        Prefix for the saved plot file.
+    title : str, optional
+        Plot title.
+    xlabel : str, optional
+        Label for x-axis.
+    ylabel : str, optional
+        Label for y-axis.
+    palette : dict or str, optional
+        Color palette to use.
+    legend : bool, optional
+        Whether to show the legend. Default is True.
+
+    Returns
+    -------
+    None
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(data=df, x=x_column, y=y_column, hue=hue_column, palette=palette, legend=legend)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.tight_layout()
+
+    filename = f"{filename_prefix}_{y_column}_vs_{x_column}.png"
+    filepath = os.path.join(output_dir, filename)
+    plt.savefig(filepath)
+    plt.close()
+
+
