@@ -3,6 +3,8 @@
 Project still in progress...
 
 Reference: [Think Stats: Exploratory Data Analysis in Python, 3rd Edition](https://allendowney.github.io/ThinkStats/index.html)
+This project uses the thinkstats.py module by Allen B. Downey, released under the MIT License. See [MIT License](https://opensource.org/licenses/MIT) for details.
+
 
 Datasets:
 
