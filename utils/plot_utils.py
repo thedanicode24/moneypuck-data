@@ -1,7 +1,8 @@
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from empiricaldist import Cdf
+from empiricaldist import Cdf, Pmf
+from utils import thinkstats
 
 def save_histogram(
     df,
@@ -256,3 +257,34 @@ def save_pmf(values, output_dir, title="PMF"):
     filename = f"{output_dir}.png"
     plt.savefig(filename)
     plt.close()
+
+
+def create_pmf(values):
+    """
+    Generate and save a PMF plot comparing the actual and observed distributions.
+
+    Parameters
+    ----------
+    values : sequence
+        A sequence of values from which to compute the PMF.
+    output_dir : str
+        The directory where the plot will be saved. It will be created if it doesn't exist.
+    title : str
+        A label for the plot title, typically describing the context or situation. Default: "PMF"
+    filename : str, optional
+        The name of the file to save the plot as. Default: "PMF"
+
+    Returns
+    -------
+    str
+        The full path to the saved plot file.
+    """
+    actual_pmf = Pmf.from_seq(values, name="Actual")
+    observed_pmf = thinkstats.bias(actual_pmf, name="Observed")
+
+    plt.figure(figsize=(8,6))
+    thinkstats.two_bar_plots(actual_pmf, observed_pmf)
+
+    #plt.title(title)
+    #plt.tight_layout()
+    plt.show()
