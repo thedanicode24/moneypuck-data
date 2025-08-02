@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from empiricaldist import Pmf
 from utils import thinkstats
+import matplotlib.pyplot as plt
 
 def create_pmf(df, feature, name="pmf"):
     """
@@ -18,7 +18,7 @@ def create_pmf(df, feature, name="pmf"):
         
     return Pmf.from_seq(df[feature], name=name)
 
-def plot_pmf(df, feature, width=2, xlabel="Feature", ylabel="PMF"):
+def plot_pmf(df, feature, width=2, xlabel="Feature", ylabel="PMF", figsize=(12,8)):
     """
     Plots the actual and observed (biased) PMFs of a given feature from a DataFrame.
 
@@ -28,13 +28,17 @@ def plot_pmf(df, feature, width=2, xlabel="Feature", ylabel="PMF"):
         width (int): Bar width for the plot.
         xlabel (str): Label for the x-axis.
         ylabel (str): Label for the y-axis.
+        figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
 
     actual_pmf = create_pmf(df, feature, name="Actual")
     observed_pmf = thinkstats.bias(actual_pmf, name="Observed")
 
+    plt.figure(figsize=figsize)
     thinkstats.two_bar_plots(actual_pmf, observed_pmf, width=width)
-    thinkstats.decorate(xlabel=xlabel, ylabel=ylabel)
+    plt.grid(True)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
     print("Actual PMF: ")
     print_stats(actual_pmf)
@@ -56,7 +60,7 @@ def print_stats(pmf):
     print(f"Mode: {pmf.mode()}")
     print(f"Skewness: {pmf_skewness(pmf):.2f}")
 
-def plot_two_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feature", ylabel="Probability"):
+def plot_two_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feature", ylabel="Probability", figsize=(12,8)):
     """
     Plots the PMFs of a feature from two different DataFrames for comparison.
 
@@ -68,15 +72,20 @@ def plot_two_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Featu
         name2 (str): Name label for the second PMF.
         xlabel (str): Label for the x-axis.
         ylabel (str): Label for the y-axis.
+        figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
         
     pmf1 = Pmf.from_seq(df1[feature], name=name1)
     pmf2 = Pmf.from_seq(df2[feature], name=name2)
 
+    plt.figure(figsize=figsize)
     thinkstats.two_bar_plots(pmf1, pmf2)
-    thinkstats.decorate(xlabel=xlabel, ylabel=ylabel)
+    plt.grid(True)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
-def plot_diff_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feature", ylabel="Difference (%)"):
+
+def plot_diff_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feature", ylabel="Difference (%)", figsize=(12,8)):
     """
     Plots the percentage difference between the PMFs of a feature from two DataFrames.
 
@@ -94,8 +103,11 @@ def plot_diff_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feat
     pmf2 = Pmf.from_seq(df2[feature], name=name2)
 
     diff = (pmf1-pmf2)*100
+    plt.figure(figsize=figsize)
     diff.bar()
-    thinkstats.decorate(xlabel=xlabel, ylabel=ylabel)
+    plt.grid(True)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
 def pmf_skewness(pmf):
     """

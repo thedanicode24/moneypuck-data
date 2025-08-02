@@ -1,7 +1,8 @@
 from empiricaldist import FreqTab
 from utils import thinkstats
+import matplotlib.pyplot as plt
 
-def plot_ftab(df, feature, xlabel="Feature", ylabel="Frequency"):
+def plot_ftab(df, feature, xlabel="Feature", ylabel="Frequency", figsize=(12,8)):
     """
     Plot a frequency bar chart of a specific feature in a DataFrame.
 
@@ -10,14 +11,16 @@ def plot_ftab(df, feature, xlabel="Feature", ylabel="Frequency"):
     feature (str): The column name of the feature to analyze.
     xlabel (str, optional): Label for the x-axis. Default is "Feature".
     ylabel (str, optional): Label for the y-axis. Default is "Frequency".
+    figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
     
     print_stats(df, feature)
     ftab = FreqTab.from_seq(df[feature], name=feature)
+    plt.figure(figsize=figsize)
     ftab.bar()
-    thinkstats.decorate(xlabel=xlabel, ylabel=ylabel, legend=False)
+    plt.grid(True)
 
-def plot_two_ftabs(df1, df2, feature, name1="Name1", name2="Name2"):
+def plot_two_ftabs(df1, df2, feature, name1="Name1", name2="Name2", figsize=(12,8)):
     """
     Plot two frequency bar charts for the same feature from two different DataFrames
     and print the Cohen's effect size between the distributions.
@@ -28,12 +31,15 @@ def plot_two_ftabs(df1, df2, feature, name1="Name1", name2="Name2"):
     feature (str): The column name of the feature to analyze.
     name1 (str, optional): Label for the first dataset in the plot. Default is "Name1".
     name2 (str, optional): Label for the second dataset in the plot. Default is "Name2".
+    figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
 
     print(f"Cohen's effect size: {thinkstats.cohen_effect_size(df1[feature], df2[feature]):.2f}")
     ftab1 = FreqTab.from_seq(df1[feature], name=name1)
     ftab2 = FreqTab.from_seq(df2[feature], name=name2)
+    plt.figure(figsize=figsize)
     thinkstats.two_bar_plots(ftab1, ftab2)
+    plt.grid(True)
 
 def print_stats(df, feature):
     """

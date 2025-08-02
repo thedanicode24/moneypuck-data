@@ -1,7 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from empiricaldist import Cdf, Pmf
 from utils import thinkstats
 
 def save_histogram(
@@ -184,43 +183,3 @@ def save_scatterplot(
     filepath = os.path.join(output_dir, filename)
     plt.savefig(filepath)
     plt.close()
-
-
-def save_cdf(values, reference_value, output_dir, title="CDF", reference_label="Reference"):
-    """
-    Generates and saves a CDF (Cumulative Distribution Function) plot from a sequence of values,
-    with a vertical line marking a reference value and a custom label.
-
-    Parameters:
-    -----------
-    values : array-like
-        A sequence of numeric values to compute the CDF from.
-    reference_value : float
-        A single numeric value to mark with a vertical line on the plot.
-    output_dir : str
-        Path where the plot will be saved.
-    title : str, optional
-        Title of the plot. Default is None.
-    reference_label : str, optional
-        Description of the reference value, shown in the legend. Default is 'Reference'.
-
-    Returns:
-    --------
-    None
-        The plot is saved to the specified output path.
-    """
-    cdf = Cdf.from_seq(values)
-
-    plt.figure(figsize=(8,6))
-    cdf.step()
-    plt.axvline(reference_value, ls=":", color="gray", label=f"{reference_label}: {reference_value:.2f}")
-    plt.xlabel("Value")
-    plt.ylabel("CDF")
-    plt.legend()
-    plt.tight_layout()
-
-    filename = f"{output_dir}.png"
-
-    plt.savefig(filename, dpi=300)
-    plt.close()
-
