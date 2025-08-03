@@ -43,7 +43,7 @@ def plot_cdf(ref, values, figsize=(12,8), label="Reference", xlabel="Feature", y
     print_percentile_stats(cdf)
     plt.figure(figsize=figsize)
     cdf.step()
-    plt.axvline(ref, ls=":", color="red", label=f"{label}: {int(ref)}")
+    plt.axvline(ref, ls=":", color="red", label=f"{label}: {ref:.2f}")
     plt.legend()
     plt.grid(True)
     plt.xlabel(xlabel)
