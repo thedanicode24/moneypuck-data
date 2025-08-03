@@ -43,8 +43,6 @@ def report_nan(df: pd.DataFrame) -> None:
     else:
         print("No missing values found.")
 
-import pandas as pd
-
 def save_column_names(df: pd.DataFrame, filename: str = "names_columns.txt") -> None:
     """
     Saves the column names of a pandas DataFrame to a text file, one per line.
@@ -86,16 +84,20 @@ def drop_duplicate_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     """
     to_drop = []
 
-    for i, col_i in enumerate(columns):
-        if col_i in to_drop:
-            continue
-        for col_j in columns[i+1:]:
-            if col_j in to_drop:
+    try:
+        for i, col_i in enumerate(columns):
+            if col_i in to_drop:
                 continue
-            if (df[col_i] == df[col_j]).all():
-                to_drop.append(col_j)
+            for col_j in columns[i+1:]:
+                if col_j in to_drop:
+                    continue
+                if (df[col_i] == df[col_j]).all():
+                    to_drop.append(col_j)
 
-    df = df.drop(columns=to_drop)
-    print(f"Dropped columns: {to_drop}")
-    print(f"Number of features: {df.shape[1]}")
-    return df
+        df = df.drop(columns=to_drop)
+        print(f"Dropped columns: {to_drop}")
+        print(f"Number of features: {df.shape[1]}")
+        return df
+    except KeyError as e:
+        print(f"Error: {e}")
+        return df
