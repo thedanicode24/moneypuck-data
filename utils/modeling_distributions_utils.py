@@ -1,23 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from empiricaldist import Pmf
-from utils import thinkstats
+from utils import thinkstats, pmf_utils
 from scipy.special import gammaln
-
-def create_pmf(df, feature, name="pmf"):
-    """
-    Creates a Probability Mass Function (PMF) from a given DataFrame column.
-
-    Parameters:
-        df (DataFrame): The input DataFrame.
-        feature (str): The column name to create the PMF from.
-        name (str): The name to assign to the PMF.
-
-    Returns:
-        Pmf: The resulting PMF.
-    """
-
-    return Pmf.from_seq(df[feature], name=name)
 
 def estimate_r(mu, var):
     """
@@ -68,7 +53,7 @@ def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
     ylabel (str): Label for the y-axis of the plot. Default is "PMF".
     """
     
-    pmf = create_pmf(df, feature, name="Results")
+    pmf = pmf_utils.create_pmf(df, feature, name="Results")
     mean = pmf.mean()
     var = pmf.var()
     r = estimate_r(mean, var)
