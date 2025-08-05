@@ -52,7 +52,7 @@ def plot_kde(
     df, feature, 
     dataset_name="data", 
     figsize=(12, 8), 
-    xlabel="Interval (minutes)", 
+    xlabel="Interval", 
     ylabel="Density",
     title="Kernel Density Estimate",
     num_points=1000
