@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from utils.thinkstats import jitter
+import numpy as np
+from utils.thinkstats import jitter, standardize
+
+from utils import thinkstats
+
 
 def plot_scatter(val1, val2, figsize=(12,8), xlabel="Feature 1", ylabel="Feature 2"):
     plt.figure(figsize=figsize)
@@ -48,3 +52,32 @@ def plot_decile(df, feature1, feature2, figsize=(12,8), alpha=0.2, xlabel="Featu
     plt.ylabel(ylabel)
     plt.grid()
     plt.legend()
+
+def plot_zscore_and_corr(vals1, vals2, 
+                         lw=1, 
+                         alpha=0.5, 
+                         figsize=(12,8),
+                         color_line="gray", 
+                         label1="Feature 1", 
+                         label2="Feature 2", 
+                         start_sample=0,
+                         end_sample=None):
+    # zscores
+    feature1_standard = standardize(vals1)
+    feature2_standard = standardize(vals2)
+
+    if end_sample is None:
+        end_sample = min(len(feature1_standard), len(feature2_standard))
+    
+    plt.figure(figsize=figsize)
+    plt.subplot(2, 1, 1)
+    plt.axhline(0, color=color_line, lw=lw, alpha=alpha)
+    plt.plot(feature1_standard.values[start_sample:end_sample], label=label1)
+    plt.ylabel("Z-score")
+    
+    plt.subplot(2, 1, 2)
+    plt.axhline(0, color=color_line, lw=lw, alpha=alpha)
+    plt.plot(feature2_standard.values[start_sample:end_sample], label=label2, color="C1")
+    plt.ylabel("Z-score")
+    
+    print(f"Pearson correlation coefficient: {np.corrcoef(vals1, vals2)[0, 1]:.3f}")
