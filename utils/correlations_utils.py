@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from scipy.stats import spearmanr
 from utils.thinkstats import jitter, standardize
-
-from utils import thinkstats
-
 
 def plot_scatter(val1, val2, figsize=(12,8), xlabel="Feature 1", ylabel="Feature 2"):
     plt.figure(figsize=figsize)
@@ -62,6 +60,9 @@ def plot_zscore_and_corr(vals1, vals2,
                          label2="Feature 2", 
                          start_sample=0,
                          end_sample=None):
+    """
+    Pearson correlation coefficient: A statistic that measures the strength and sign (positive or negative) of the linear relationship between two variables.
+    """
     # zscores
     feature1_standard = standardize(vals1)
     feature2_standard = standardize(vals2)
@@ -70,14 +71,38 @@ def plot_zscore_and_corr(vals1, vals2,
         end_sample = min(len(feature1_standard), len(feature2_standard))
     
     plt.figure(figsize=figsize)
+
     plt.subplot(2, 1, 1)
     plt.axhline(0, color=color_line, lw=lw, alpha=alpha)
     plt.plot(feature1_standard.values[start_sample:end_sample], label=label1)
+    plt.legend()
     plt.ylabel("Z-score")
     
     plt.subplot(2, 1, 2)
     plt.axhline(0, color=color_line, lw=lw, alpha=alpha)
     plt.plot(feature2_standard.values[start_sample:end_sample], label=label2, color="C1")
+    plt.legend()
     plt.ylabel("Z-score")
+    plt.grid()
     
     print(f"Pearson correlation coefficient: {np.corrcoef(vals1, vals2)[0, 1]:.3f}")
+
+def plot_rank_correlation(vals1, vals2, 
+                          figsize=(12,8), 
+                          size_points=5, 
+                          alpha=0.5, 
+                          xlabel="Feature 1", 
+                          ylabel="Feature 2"):
+    vals1_rank = vals1.rank(method="first")
+    vals2_rank = vals2.rank(method="first")
+
+    plt.figure(figsize=figsize)
+    plt.scatter(vals1_rank, vals2_rank, s=size_points, alpha=alpha)
+    plt.title("Rank correlation")
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.grid()
+
+    print(f"Spearman's rank correlation coefficient: {spearmanr(vals1, vals2).statistic:.3f}")
+    
+    
