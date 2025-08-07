@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from empiricaldist import Pmf
-from utils import thinkstats, pmf_utils
+from utils.thinkstats import two_bar_plots
+from utils.distribution_analysis import create_pmf
 from scipy.special import gammaln
 from scipy.stats import nbinom
 
@@ -54,7 +55,7 @@ def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
     ylabel (str): Label for the y-axis of the plot. Default is "PMF".
     """
     
-    pmf = pmf_utils.create_pmf(df, feature, name="Results")
+    pmf = create_pmf(df, feature, name="Results")
     mean = pmf.mean()
     var = pmf.var()
     r = estimate_r(mean, var)
@@ -64,7 +65,7 @@ def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
     pmf_negbin = Pmf(neg, vals, name="Negative Binomial Model")
 
     plt.figure(figsize=(12,8))
-    thinkstats.two_bar_plots(pmf, pmf_negbin)
+    two_bar_plots(pmf, pmf_negbin)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
