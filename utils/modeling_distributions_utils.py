@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from empiricaldist import Pmf
 from utils import thinkstats, pmf_utils
 from scipy.special import gammaln
+from scipy.stats import nbinom
 
 def estimate_r(mu, var):
     """
@@ -67,3 +68,39 @@ def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
+
+    estimate_negative_binomial(mean, r)
+
+def estimate_negative_binomial(mean, r, figsize=(12,8)):
+    p = r / (r + mean)
+    ns = np.logspace(1, 5).astype(int)
+
+    means = [np.mean(nbinom.rvs(r, p, size=n)) for n in ns]
+    medians = [np.median(nbinom.rvs(r, p, size=n)) for n in ns]
+
+    plt.figure(figsize=figsize)
+    plt.axhline(mean, color="red", lw=1, alpha=0.5, linestyle="--")
+    plt.plot(ns, means, label="Mean")
+    plt.plot(ns, medians, label="Median")
+    plt.title("Estimation: Negative Binomial")
+    plt.xlabel("Sample size")
+    plt.xscale("log")
+    plt.ylabel("Estimate")
+    plt.grid(True)
+    plt.legend()
+
+    print(f"Mean Squared Error of the sample means: {mse(means, mean):.3f}")
+    print(f"Mean Absolute Error of the sample means: {mae(means, mean):.3f}")
+
+    print(f"Mean Squared Error of the sample medians: {mse(medians, mean):.3f}")
+    print(f"Mean Absolute Error of the sample medians: {mae(medians, mean):.3f}")
+
+def mae(estimates, actual):
+    """Mean absolute error of a sequence of estimates."""
+    errors = np.asarray(estimates) - actual
+    return np.mean(np.abs(errors))
+
+def mse(estimates, actual):
+    """Mean squared error of a sequence of estimates."""
+    errors = np.asarray(estimates) - actual
+    return np.mean(errors**2)
