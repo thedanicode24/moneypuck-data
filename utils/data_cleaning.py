@@ -17,7 +17,6 @@ def print_df_size(df: pd.DataFrame) -> None:
     print(f"Number of samples: {df.shape[0]}")
     print(f"Number of features: {df.shape[1]}")
 
-
 def report_nan(df: pd.DataFrame) -> None:
     """
     Checks for missing (NaN) values in a pandas DataFrame and prints a summary.
