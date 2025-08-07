@@ -77,6 +77,7 @@ def plot_zscore_and_corr(vals1, vals2,
     plt.plot(feature1_standard.values[start_sample:end_sample], label=label1)
     plt.legend()
     plt.ylabel("Z-score")
+    plt.grid()
     
     plt.subplot(2, 1, 2)
     plt.axhline(0, color=color_line, lw=lw, alpha=alpha)
