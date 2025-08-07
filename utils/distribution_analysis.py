@@ -4,6 +4,7 @@ from utils.thinkstats import cohen_effect_size, two_bar_plots, bias, percentile_
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
+
 ###############################
 # Frequency Table
 ###############################
@@ -299,7 +300,6 @@ def print_percentile_stats(cdf):
 
 def plot_gaussian_kde(
     data,
-    num_points=1000,
     figsize=(12, 8),
     xlabel="Feature",
     ylabel="Density",
@@ -311,7 +311,6 @@ def plot_gaussian_kde(
 
     Parameters:
         data (array-like): Input data to estimate the density from.
-        num_points (int): Number of points to evaluate the KDE and normal PDF over.
         figsize (tuple): Size of the matplotlib figure.
         xlabel (str): Label for the x-axis.
         ylabel (str): Label for the y-axis.
@@ -342,14 +341,61 @@ def plot_gaussian_kde(
     plt.grid(True)
     plt.show()
 
+
+def create_pmf_from_kde(sample_data, lower_bound, upper_bound, num_points=200, weights=None):
+    """
+    Estimate a Probability Mass Function (PMF) by approximating a Kernel Density Estimate (KDE).
+
+    Parameters:
+    ----------
+    sample_data : array-like
+        The input data sample to estimate the distribution from.
+    lower_bound : float
+        The minimum value in the range over which to evaluate the KDE.
+    upper_bound : float
+        The maximum value in the range over which to evaluate the KDE.
+    num_points : int, optional
+        Number of equally spaced points between lower_bound and upper_bound (default is 201).
+
+    Returns:
+    -------
+    Pmf
+        A probability mass function approximated from the KDE over the specified range.
+    """
+    kde_estimator = gaussian_kde(sample_data, weights=weights)
+    x_values = np.linspace(lower_bound, upper_bound, num_points)
+    density_values = kde_estimator(x_values)
+    return Pmf(density_values, x_values)
+
+def create_pdf_from_pmf(df, feature, name="Estimated PDF"):
+    """
+    Create a Probability Density Function (PDF) by applying a Kernel Density Estimate (KDE)
+    to a given Probability Mass Function (PMF).
+
+    Parameters:
+    ----------
+    pmf : Pmf
+        A probability mass function with discrete values (pmf.qs) and their probabilities (pmf.ps).
+    name : str, optional
+        Name to assign to the resulting PDF (default is "Estimated PDF").
+
+    Returns:
+    -------
+    Pdf
+        A continuous probability density function estimated via KDE from the input PMF.
+    """
+    pmf = create_pmf(df, feature)
+    kde = gaussian_kde(pmf.qs, weights=pmf.ps)
+    domain = (np.min(pmf.qs), np.max(pmf.qs))
+    return Pdf(kde, domain=domain, name=name)
+
 def plot_kde(
     df, feature, 
     dataset_name="data", 
     figsize=(12, 8), 
     xlabel="Interval", 
     ylabel="Density",
-    title="Kernel Density Estimate",
-    num_points=1000
+    title="Kernel Density Estimate"
 ):
     """
     Computes and plots a Kernel Density Estimate (KDE) based on the PMF of a given feature in a DataFrame.
@@ -374,17 +420,12 @@ def plot_kde(
     None
     """
 
-    pmf = create_pmf(df, feature, name=dataset_name)
-    
-    # Estimate KDE using the PMF's values and probabilities
-    kde_estimator = gaussian_kde(pmf.qs, weights=pmf.ps)
-    domain = (np.min(pmf.qs), np.max(pmf.qs))
+    estimated_pdf = create_pdf_from_pmf(df, feature, name="Estimated Density")
     
     # Generate KDE plot
     plt.figure(figsize=figsize)
     plt.title(title)
 
-    estimated_pdf = Pdf(kde_estimator, domain=domain, name="Estimated Density")
     estimated_pdf.plot(ls=":", color="gray")
     
     plt.xlabel(xlabel)
