@@ -6,6 +6,7 @@ from utils.thinkstats import jitter, standardize
 
 def plot_scatter(val1, val2, figsize=(12,8), xlabel="Feature 1", ylabel="Feature 2"):
     plt.figure(figsize=figsize)
+    plt.title("Scatter plot")
     plt.scatter(val1, val2)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -22,7 +23,8 @@ def plot_scatter_with_jitter(
     val1_jittered = jitter(val1, std_dev)
     val2_jittered = jitter(val2, std_dev)
     plt.figure(figsize=figsize)
-    plt.scatter(val1_jittered, val2, s=size_points, alpha=alpha)
+    plt.title("Scatter plot with jitter")
+    plt.scatter(val1_jittered, val2_jittered, s=size_points, alpha=alpha)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid()
@@ -44,6 +46,7 @@ def plot_decile(df, feature1, feature2, figsize=(12,8), alpha=0.2, xlabel="Featu
     y_high = high.sort_index().values
     
     plt.figure(figsize=figsize)
+    plt.title("Decile plot")
     plt.fill_between(x_vals, y_low, y_high, alpha=alpha)
     plt.plot(x_vals, y_med, color=color, label="Median")
     plt.xlabel(xlabel)
