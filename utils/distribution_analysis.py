@@ -1,6 +1,6 @@
 import numpy as np
 from empiricaldist import FreqTab, Pmf, Cdf
-from utils.thinkstats import cohen_effect_size, two_bar_plots, bias, percentile_rank, median, iqr, quartile_skewness, Pdf, NormalPdf
+from utils.thinkstats import plot_kde, cohen_effect_size, two_bar_plots, bias, percentile_rank, median, iqr, quartile_skewness, Pdf, NormalPdf
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
@@ -389,7 +389,7 @@ def create_pdf_from_pmf(df, feature, name="Estimated PDF"):
     domain = (np.min(pmf.qs), np.max(pmf.qs))
     return Pdf(kde, domain=domain, name=name)
 
-def plot_kde(
+def plot_gaussian_kde(
     df, feature, 
     dataset_name="data", 
     figsize=(12, 8), 
@@ -419,17 +419,11 @@ def plot_kde(
     -------
     None
     """
-
-    estimated_pdf = create_pdf_from_pmf(df, feature, name="Estimated Density")
     
-    # Generate KDE plot
     plt.figure(figsize=figsize)
     plt.title(title)
-
-    estimated_pdf.plot(ls=":", color="gray")
-    
+    plot_kde(df[feature])
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)
-    plt.legend()
 
