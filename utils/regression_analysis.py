@@ -1,20 +1,23 @@
-from scipy.stats import linregress
+import statsmodels.formula.api as smf
+from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from utils.thinkstats import display_summary
 
-def predict(result, xs):
-    ys = result.intercept + result.slope * xs
-    return ys
+def plot_linear_regression(df, feat1, feat2, figsize=(12,8), xlabel="Feature 1", ylabel="Feature 2", n_points=100):
+    formula = feat2 + " ~ " + feat1
+    model = smf.ols(formula, data=df)
+    result = model.fit()
+    fit_xs = np.linspace(df[feat1].min(), df[feat1].max(), n_points)
+    fit_df = pd.DataFrame({feat1: fit_xs})
+    fit_ys = result.predict(fit_df)
 
-def plot_linear_regression(df1, df2, figsize=(12,8), xlabel="Feature 1", ylabel="Feature 2"):
-    result = linregress(df1, df2)
-    fit_xs = np.linspace(np.min(df1), np.max(df1))
-    fit_ys = predict(result, fit_xs)
-
-    print_metrics(df1, df2, result)
+    display_summary(result)
+    print(f"P-value: {result.pvalues[feat1]}")
 
     plt.figure(figsize=figsize)
-    plt.scatter(df1, df2, marker=".", alpha=0.7, label="Observed data")
+    plt.scatter(df[feat1], df[feat2], marker=".", alpha=0.7, label="Observed data")
     plt.title("Linear Regression")
     plt.plot(fit_xs, fit_ys, color="C1", label="Best fit line")
     plt.xlabel(xlabel)
@@ -22,24 +25,12 @@ def plot_linear_regression(df1, df2, figsize=(12,8), xlabel="Feature 1", ylabel=
     plt.grid()
     plt.legend()
 
-def compute_residuals(result, xs, y):
-    y_pred = predict(result, xs)
-    return y - y_pred
-
-def compute_mse(result, xs, y):
-    residuals = compute_residuals(result, xs, y)
-    return np.mean(residuals**2)
-
-def print_metrics(df1, df2, result):
-    print(f"Mean Squared Error: {compute_mse(result, df1, df2):.3f}")
-    print(f"Coefficient of determination: {result.rvalue**2:.3f}")
-    print(f"Standard error: {result.stderr:.3f}")
-
-
 def fit_line(df, feat1, feat2, fit_xs):
-    xs, ys = df[feat1], df[feat2]
-    result = linregress(xs, ys)
-    fit_ys = predict(result, fit_xs)
+    formula = f"{feat2} ~ {feat1}"
+    model = smf.ols(formula, data=df)
+    result = model.fit()
+    fit_df = pd.DataFrame({feat1: fit_xs})
+    fit_ys = result.predict(fit_df)
     return fit_ys
 
 def resample(df):
