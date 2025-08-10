@@ -111,7 +111,7 @@ OnIce_F_xGoalsFromActualReboundsOfShots
 OnIce_F_reboundxGoals
 OnIce_F_xGoals_with_earned_rebounds
 OnIce_F_xGoals_with_earned_rebounds_scoreAdjusted
-OnIce_F_xGoals_with_earned_rebounds_scoreFlurryAdjusted
+OnIce_F_xGoals_with_earned_rebounds_scoreFlurryAdjusted                                                                                                                                                                                                                                                                                                                
 OnIce_A_xOnGoal
 OnIce_A_xGoals
 OnIce_A_flurryAdjustedxGoals
