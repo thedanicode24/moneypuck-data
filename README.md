@@ -1,6 +1,6 @@
 # Hockey Skaters Stats Analysis
 
-Statistical analysis of ice hockey players (**skaters**) from the **2024/25** NHL season, using a dataset from [MoneyPuck](https://moneypuck.com).  
+Statistical analysis of National Hockey League players, using a dataset from [MoneyPuck](https://moneypuck.com).  
 
 ## Goals
 - Explore the dataset to understand its structure and variables.
