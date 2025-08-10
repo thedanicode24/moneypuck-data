@@ -1,33 +1,61 @@
-# moneypuck-data
+# Hockey Skaters Stats Analysis
 
-Project still in progress...
+## Project Status
+🚧 **In Development**  
+Currently working on:
+- Data cleaning and preparation.
+- Descriptive statistical analysis.
+- Initial data visualization.
 
-Reference: [Think Stats: Exploratory Data Analysis in Python, 3rd Edition](https://allendowney.github.io/ThinkStats/index.html)
-This project uses the thinkstats.py module by Allen B. Downey, released under the MIT License. See [MIT License](https://opensource.org/licenses/MIT) for details.
+Statistical analysis of ice hockey players (**skaters**) from the **2024/25** NHL season, using a dataset from [MoneyPuck](https://moneypuck.com).  
 
+## Goals
+- Explore the dataset to understand its structure and variables.
+- Apply descriptive and inferential statistical techniques.
+- Experiment with data visualization approaches.
+- Prepare potential predictive models (future stage).
 
-Datasets:
+## Dataset
+- **Source:** [MoneyPuck.com](https://moneypuck.com)
+- **Type:** NHL skaters statistics for the 2024/25 season.
+- **Format:** CSV.
 
-All teams dataset
-[all_teams_df](https://moneypuck.com/moneypuck/playerData/careers/gameByGame/all_teams.csv)
+## Environment
+This project is designed to be run in a **Jupyter Notebook** environment for interactive data analysis and visualization.
 
-Season 2024-2025: Skaters
-[skaters_df](https://moneypuck.com/moneypuck/playerData/seasonSummary/2024/regular/skaters.csv)
+## Technologies Used
+- **Language:** Python 3
+- **Main Libraries:**
+  - pandas – data manipulation and analysis.
+  - numpy – numerical computations and array handling.
+  - matplotlib / seaborn – data visualization.
+  - empiricaldist – working with empirical distributions.
+  - scipy – advanced statistical functions.
+  - statsmodels – statistical modeling and regression.
+  - scikit-learn – machine learning and predictive modeling.
 
-Season 2024-2025: Goalies
-[goalies_df](https://moneypuck.com/moneypuck/playerData/seasonSummary/2024/regular/goalies.csv)
+## Project Status
+🚧 **In Development**  
+Currently working on:
+- Data cleaning and preparation.
+- Descriptive statistical analysis.
+- Initial data visualization.
 
-Season 2024-2025: Lines
-[lines_df](https://moneypuck.com/moneypuck/playerData/seasonSummary/2024/regular/lines.csv)
+## How to Run
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/thedanicode24/moneypuck-data.git
+   cd moneypuck-data
+   ```
 
-Season 2024-2025: Team level
-[team_df](https://moneypuck.com/moneypuck/playerData/seasonSummary/2024/regular/teams.csv)
+2. Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-Toronto Maple Leafs
-[tor_df](https://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/teams/TOR.csv)
+## References
+- [Think Stats: Exploratory Data Analysis in Python, 3rd Edition](https://allendowney.github.io/ThinkStats/index.html)
+- [Money Puck](https://moneypuck.com)
 
-AM: Summary
-[am_df](https://moneypuck.com/moneypuck/playerData/careers/perSeason/regular/skaters/8479318.csv)
-
-AM: game by game
-[am_games](https://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/skaters/8479318.csv)
+## License
+This project is licensed under the MIT License — see the [MIT License](https://opensource.org/licenses/MIT) file for details. 
