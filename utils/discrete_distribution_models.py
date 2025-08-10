@@ -6,6 +6,58 @@ from utils.distribution_analysis import create_pmf
 from scipy.special import gammaln
 from scipy.stats import nbinom
 
+def mae(estimates, true_value):
+    """
+    Compute the Mean Absolute Error (MAE) between a list of estimates and the true value.
+
+    MAE is defined as the average of the absolute differences between 
+    each estimate and the true parameter value. It provides a more interpretable
+    measure of average error than MSE, without squaring the differences.
+
+    Parameters:
+    ----------
+    estimates : list or np.array
+        A list or array of estimated values.
+
+    true_value : float
+        The true value of the parameter being estimated.
+
+    Returns:
+    -------
+    float
+        The mean absolute error.
+    """
+    errors = np.asarray(estimates) - true_value
+    return np.mean(np.abs(errors))
+
+def mse(estimates, true_value):
+    """
+    Compute the Mean Squared Error (MSE) between a list of estimates and the true value.
+
+    MSE is defined as the average of the squared differences between 
+    each estimate and the true parameter value. It measures the accuracy
+    of an estimator by penalizing larger deviations more heavily.
+
+    Parameters:
+    ----------
+    estimates : list or np.array
+        A list or array of estimated values.
+
+    true_value : float
+        The true value of the parameter being estimated.
+
+    Returns:
+    -------
+    float
+        The mean squared error.
+    """
+    errors = np.array(estimates) - true_value
+    return np.mean(errors ** 2)
+
+####################################
+# Negative Binomial Distribution
+####################################
+
 def estimate_r(mu, var):
     """
     Estimate the parameter 'r' of the negative binomial distribution 
@@ -26,7 +78,7 @@ def estimate_r(mu, var):
         raise ValueError("Variance must be larger than mean.")
     return mu**2 / (var - mu)
 
-def negbinom_pmf(k, mu, r):
+def negative_binomial_pmf(k, mu, r):
     """
     Compute the probability mass function (PMF) of the negative binomial distribution.
 
@@ -43,7 +95,7 @@ def negbinom_pmf(k, mu, r):
     log_p = r * np.log(r / (r + mu)) + k * np.log(mu / (r + mu))
     return np.exp(log_coeff + log_p)
 
-def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
+def plot_empirical_vs_nb_model(df, feature, values, xlabel="Feature", ylabel="PMF"):
     """
     Plot the empirical PMF of a feature alongside the fitted negative binomial model.
 
@@ -61,7 +113,7 @@ def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
     r = estimate_r(mean, var)
 
     vals = np.array(values)
-    neg = negbinom_pmf(vals, mean, r)
+    neg = negative_binomial_pmf(vals, mean, r)
     pmf_negbin = Pmf(neg, vals, name="Negative Binomial Model")
 
     plt.figure(figsize=(12,8))
@@ -72,7 +124,7 @@ def plot_negative_binomial(df, feature, values, xlabel="Feature", ylabel="PMF"):
 
     return mean, var, r
 
-def estimate_negative_binomial(mean, r, figsize=(12,8), num_reps=1000):
+def simulate_mean_estimation_nb(mean, r, figsize=(12,8), num_reps=1000):
     """
     Simulate the estimation of the mean from a negative binomial distribution
     across different sample sizes. Computes standard error and confidence intervals.
@@ -129,7 +181,6 @@ def estimate_negative_binomial(mean, r, figsize=(12,8), num_reps=1000):
     ci_low = np.array(ci_low)
     ci_high = np.array(ci_high)
 
-    # Plot
     plt.figure(figsize=figsize)
 
     plt.axhline(mean, color="red", lw=1, alpha=0.5, linestyle="--", label="True Mean")
@@ -145,57 +196,7 @@ def estimate_negative_binomial(mean, r, figsize=(12,8), num_reps=1000):
     plt.grid(True)
     plt.legend()
 
-    # Print errors
     print(f"Mean Squared Error (Mean): {mse(means, mean):.4f}")
     print(f"Mean Absolute Error (Mean): {mae(means, mean):.4f}")
     print(f"Mean Squared Error (Median): {mse(medians, mean):.4f}")
     print(f"Mean Absolute Error (Median): {mae(medians, mean):.4f}")
-
-
-def mae(estimates, true_value):
-    """
-    Compute the Mean Absolute Error (MAE) between a list of estimates and the true value.
-
-    MAE is defined as the average of the absolute differences between 
-    each estimate and the true parameter value. It provides a more interpretable
-    measure of average error than MSE, without squaring the differences.
-
-    Parameters:
-    ----------
-    estimates : list or np.array
-        A list or array of estimated values.
-
-    true_value : float
-        The true value of the parameter being estimated.
-
-    Returns:
-    -------
-    float
-        The mean absolute error.
-    """
-    errors = np.asarray(estimates) - true_value
-    return np.mean(np.abs(errors))
-
-def mse(estimates, true_value):
-    """
-    Compute the Mean Squared Error (MSE) between a list of estimates and the true value.
-
-    MSE is defined as the average of the squared differences between 
-    each estimate and the true parameter value. It measures the accuracy
-    of an estimator by penalizing larger deviations more heavily.
-
-    Parameters:
-    ----------
-    estimates : list or np.array
-        A list or array of estimated values.
-
-    true_value : float
-        The true value of the parameter being estimated.
-
-    Returns:
-    -------
-    float
-        The mean squared error.
-    """
-    errors = np.array(estimates) - true_value
-    return np.mean(errors ** 2)

@@ -2,8 +2,7 @@ import numpy as np
 from empiricaldist import FreqTab, Pmf, Cdf
 from utils.thinkstats import plot_kde, cohen_effect_size, two_bar_plots, bias, percentile_rank, median, iqr, quartile_skewness, Pdf, NormalPdf
 import matplotlib.pyplot as plt
-from scipy.stats import gaussian_kde, norm, linregress
-
+from scipy.stats import gaussian_kde
 
 ###############################
 # Frequency Table
@@ -388,44 +387,3 @@ def create_pdf_from_pmf(df, feature, name="Estimated PDF"):
     kde = gaussian_kde(pmf.qs, weights=pmf.ps)
     domain = (np.min(pmf.qs), np.max(pmf.qs))
     return Pdf(kde, domain=domain, name=name)
-
-def plot_cdf_with_normal(data, figsize=(12,8)):
-    m, s = data.mean(), data.std()
-    cdf = create_cdf(data)
-    dist = norm(m, s)
-    qs = np.linspace(m - 3.5 * s, m + 3.5 * s)
-    ps = dist.cdf(qs)
-    model_options = dict(color="gray", alpha=0.5, label="Normal model")
-
-    plt.figure(figsize=figsize)
-    plt.plot(qs, ps, **model_options)
-    cdf.plot(label="Observed data")
-    plt.ylabel("CDF")
-    plt.grid()
-    plt.legend()
-
-def normal_probability_plot(data, ylabel="Data", figsize=(12,8)):
-    ys = np.sort(data)
-    n = len(ys)
-
-    ps = (np.arange(n) + 0.5) / n
-
-    xs = norm.ppf(ps)
-
-    results = linregress(xs, ys)
-    intercept, slope = results.intercept, results.slope
-
-    fit_xs = np.linspace(xs.min(), xs.max(), 100)
-    
-    fit_ys = intercept + slope * fit_xs
-
-    plt.figure(figsize=figsize)
-    plt.scatter(xs, ys, label="Observed data", color="blue", alpha=0.4)
-    plt.plot(fit_xs, fit_ys, color="gray", alpha=0.7, label="Normal Model")
-    plt.xlabel("Theoric quantiles (Normale standard)")
-    plt.ylabel(ylabel)
-    plt.title("Normal Probability Plot")
-    plt.grid(alpha=0.3)
-    plt.legend()
-    plt.show()
-
