@@ -33,14 +33,7 @@ This project is designed to be run in a **Jupyter Notebook** environment for int
   - scipy – advanced statistical functions.
   - statsmodels – statistical modeling and regression.
   - scikit-learn – machine learning and predictive modeling.
-
-## Project Status
-🚧 **In Development**  
-Currently working on:
-- Data cleaning and preparation.
-- Descriptive statistical analysis.
-- Initial data visualization.
-
+  
 ## How to Run
 1. Clone the repository:
    ```bash
