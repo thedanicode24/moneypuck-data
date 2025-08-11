@@ -56,6 +56,7 @@ def plot_bootstrap_regression(df, predictor, target, n_bootstrap=1000, figsize=(
     plt.plot(fit_xs, median, color="C1", label="Bootstrap median fit")
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    plt.grid()
     plt.legend()
 
 def multiple_regression(df, target, predictors, summary=True):
