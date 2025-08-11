@@ -8,19 +8,18 @@ from scipy.stats import gaussian_kde
 # Frequency Table
 ###############################
 
-def plot_ftab(df, feature, xlabel="Feature", figsize=(12,8)):
+def plot_ftab(data, xlabel="Feature", figsize=(12,8)):
     """
     Plot a frequency bar chart of a specific feature in a DataFrame.
 
     Parameters:
-    df (DataFrame): The pandas DataFrame containing the data.
-    feature (str): The column name of the feature to analyze.
+    data (DataFrame): The pandas DataFrame containing the data.
     xlabel (str, optional): Label for the x-axis. Default is "Feature".
     figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
     
-    print_stats(df, feature)
-    ftab = FreqTab.from_seq(df[feature], name=feature)
+    print_stats(data)
+    ftab = FreqTab.from_seq(data, name=xlabel)
     plt.figure(figsize=figsize)
     ftab.bar()
     plt.xlabel(xlabel)
@@ -28,7 +27,7 @@ def plot_ftab(df, feature, xlabel="Feature", figsize=(12,8)):
     plt.title("Frequency Table")
     plt.grid(True)
 
-def plot_two_ftabs(df1, df2, feature, name1="Name1", name2="Name2", figsize=(12,8), xlabel="Feature"):
+def plot_two_ftabs(df1, df2, label1="Name1", label2="Name2", figsize=(12,8), xlabel="Feature"):
     """
     Plot two frequency bar charts for the same feature from two different DataFrames
     and print the Cohen's effect size between the distributions.
@@ -36,16 +35,15 @@ def plot_two_ftabs(df1, df2, feature, name1="Name1", name2="Name2", figsize=(12,
     Parameters:
     df1 (DataFrame): The first pandas DataFrame.
     df2 (DataFrame): The second pandas DataFrame.
-    feature (str): The column name of the feature to analyze.
     name1 (str, optional): Label for the first dataset in the plot. Default is "Name1".
     name2 (str, optional): Label for the second dataset in the plot. Default is "Name2".
     figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     xlabel (str): Label for the x-axis. Default is "Feature".
     """
 
-    print(f"Cohen's effect size: {cohen_effect_size(df1[feature], df2[feature]):.2f}")
-    ftab1 = FreqTab.from_seq(df1[feature], name=name1)
-    ftab2 = FreqTab.from_seq(df2[feature], name=name2)
+    print(f"Cohen's effect size: {cohen_effect_size(df1, df2):.2f}")
+    ftab1 = FreqTab.from_seq(df1, name=label1)
+    ftab2 = FreqTab.from_seq(df2, name=label2)
     plt.figure(figsize=figsize)
     two_bar_plots(ftab1, ftab2)
     plt.grid(True)
@@ -53,19 +51,18 @@ def plot_two_ftabs(df1, df2, feature, name1="Name1", name2="Name2", figsize=(12,
     plt.ylabel("Frequency")
     plt.title("Frequency Table")
 
-def print_stats(df, feature):
+def print_stats(data):
     """
     Print basic statistics (mean, variance, standard deviation, and mode) for a given feature.
 
     Parameters:
-    df (DataFrame): The pandas DataFrame containing the data.
-    feature (str): The column name of the feature to analyze.
+    data (DataFrame): The pandas DataFrame containing the data.
     """
 
-    print(f"Mean: {df[feature].mean():.3f}")
-    print(f"Variance: {df[feature].var():.3f}")
-    print(f"Standard deviation: {df[feature].std(ddof=0):.3f}")
-    mode_values = df[feature].mode()
+    print(f"Mean: {data.mean():.3f}")
+    print(f"Variance: {data.var():.3f}")
+    print(f"Standard deviation: {data.std(ddof=0):.3f}")
+    mode_values = data.mode()
     if len(mode_values) == 1:
         print(f"Mode: {mode_values.iloc[0]}")
     else:
@@ -76,35 +73,33 @@ def print_stats(df, feature):
 # Probability Mass Function
 ####################################
 
-def create_pmf(df, feature, name="pmf"):
+def create_pmf(data, name="pmf"):
     """
     Creates a Probability Mass Function (PMF) from a given DataFrame column.
 
     Parameters:
-        df (DataFrame): The input DataFrame.
-        feature (str): The column name to create the PMF from.
+        data (DataFrame): The input DataFrame.
         name (str): The name to assign to the PMF.
 
     Returns:
         Pmf: The resulting PMF.
     """
         
-    return Pmf.from_seq(df[feature], name=name)
+    return Pmf.from_seq(data, name=name)
 
-def plot_pmf(df, feature, width=2, xlabel="Feature", ylabel="PMF", figsize=(12,8)):
+def plot_pmf(data, width=2, xlabel="Feature", ylabel="PMF", figsize=(12,8)):
     """
     Plots the actual and observed (biased) PMFs of a given feature from a DataFrame.
 
     Parameters:
-        df (DataFrame): The input DataFrame.
-        feature (str): The column name to analyze.
+        data (DataFrame): The input DataFrame.
         width (int): Bar width for the plot.
         xlabel (str): Label for the x-axis.
         ylabel (str): Label for the y-axis.
         figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
 
-    actual_pmf = create_pmf(df, feature, name="Actual")
+    actual_pmf = create_pmf(data, name="Actual")
     observed_pmf = bias(actual_pmf, name="Observed")
 
     plt.figure(figsize=figsize)
@@ -133,14 +128,13 @@ def print_pmf_stats(pmf):
     print(f"Mode: {pmf.mode()}")
     print(f"Skewness: {pmf_skewness(pmf):.3f}")
 
-def plot_two_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feature", ylabel="Probability", figsize=(12,8)):
+def plot_two_pmfs(values1, values2, label1="Name1", label2="Name2", xlabel="Feature", ylabel="Probability", figsize=(12,8)):
     """
     Plots the PMFs of a feature from two different DataFrames for comparison.
 
     Parameters:
-        df1 (DataFrame): The first DataFrame.
-        df2 (DataFrame): The second DataFrame.
-        feature (str): The feature/column name to analyze.
+        values1 (DataFrame): The first DataFrame.
+        values2 (DataFrame): The second DataFrame.
         name1 (str): Name label for the first PMF.
         name2 (str): Name label for the second PMF.
         xlabel (str): Label for the x-axis.
@@ -148,8 +142,8 @@ def plot_two_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Featu
         figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
         
-    pmf1 = Pmf.from_seq(df1[feature], name=name1)
-    pmf2 = Pmf.from_seq(df2[feature], name=name2)
+    pmf1 = Pmf.from_seq(values1, name=label1)
+    pmf2 = Pmf.from_seq(values2, name=label2)
 
     plt.figure(figsize=figsize)
     two_bar_plots(pmf1, pmf2)
@@ -158,22 +152,21 @@ def plot_two_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Featu
     plt.ylabel(ylabel)
 
 
-def plot_diff_pmfs(df1, df2, feature, name1="Name1", name2="Name2", xlabel="Feature", ylabel="Difference (%)", figsize=(12,8)):
+def plot_diff_pmfs(values1, values2, label1="Name1", label2="Name2", xlabel="Feature", ylabel="Difference (%)", figsize=(12,8)):
     """
     Plots the percentage difference between the PMFs of a feature from two DataFrames.
 
     Parameters:
-        df1 (DataFrame): The first DataFrame.
-        df2 (DataFrame): The second DataFrame.
-        feature (str): The feature/column name to analyze.
+        values1 (DataFrame): The first DataFrame.
+        values2 (DataFrame): The second DataFrame.
         name1 (str): Name label for the first PMF.
         name2 (str): Name label for the second PMF.
         xlabel (str): Label for the x-axis.
         ylabel (str): Label for the y-axis.
     """
 
-    pmf1 = Pmf.from_seq(df1[feature], name=name1)
-    pmf2 = Pmf.from_seq(df2[feature], name=name2)
+    pmf1 = Pmf.from_seq(values1, name=label1)
+    pmf2 = Pmf.from_seq(values2, name=label2)
 
     diff = (pmf1-pmf2)*100
     plt.figure(figsize=figsize)
@@ -251,7 +244,7 @@ def plot_cdf(ref, values, figsize=(12,8), label="Reference", xlabel="Feature", y
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-def plot_two_cdfs(values1, values2, name1="Name1", name2="Name2", xlabel="Feature", ylabel="CDF", figsize=(12,8)):
+def plot_two_cdfs(values1, values2, label1="Name1", label2="Name2", xlabel="Feature", ylabel="CDF", figsize=(12,8)):
     """
     Plot two CDFs on the same figure for comparison.
 
@@ -265,8 +258,8 @@ def plot_two_cdfs(values1, values2, name1="Name1", name2="Name2", xlabel="Featur
     figsize (tuple, optional): Size of the plot.
     """
 
-    pmf1 = Pmf.from_seq(values1, name=name1)
-    pmf2 = Pmf.from_seq(values2, name=name2)
+    pmf1 = Pmf.from_seq(values1, name=label1)
+    pmf2 = Pmf.from_seq(values2, name=label2)
     cdf1 = pmf1.make_cdf()
     cdf2 = pmf2.make_cdf()
     plt.figure(figsize=figsize)
@@ -366,7 +359,7 @@ def create_pmf_from_kde(sample_data, lower_bound, upper_bound, num_points=200, w
     density_values = kde_estimator(x_values)
     return Pmf(density_values, x_values)
 
-def create_pdf_from_pmf(df, feature, name="Estimated PDF"):
+def create_pdf_from_pmf(data, name="Estimated PDF"):
     """
     Create a Probability Density Function (PDF) by applying a Kernel Density Estimate (KDE)
     to a given Probability Mass Function (PMF).
@@ -383,7 +376,7 @@ def create_pdf_from_pmf(df, feature, name="Estimated PDF"):
     Pdf
         A continuous probability density function estimated via KDE from the input PMF.
     """
-    pmf = create_pmf(df, feature)
+    pmf = create_pmf(data)
     kde = gaussian_kde(pmf.qs, weights=pmf.ps)
     domain = (np.min(pmf.qs), np.max(pmf.qs))
     return Pdf(kde, domain=domain, name=name)
