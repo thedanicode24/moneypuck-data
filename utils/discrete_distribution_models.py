@@ -95,19 +95,18 @@ def negative_binomial_pmf(k, mu, r):
     log_p = r * np.log(r / (r + mu)) + k * np.log(mu / (r + mu))
     return np.exp(log_coeff + log_p)
 
-def plot_empirical_vs_nb_model(df, feature, values, xlabel="Feature", ylabel="PMF"):
+def plot_empirical_vs_nb_model(data, values, xlabel="Feature", ylabel="PMF"):
     """
     Plot the empirical PMF of a feature alongside the fitted negative binomial model.
 
     Parameters:
-    df (DataFrame): Input pandas DataFrame containing the data.
-    feature (str): Name of the column in the DataFrame to analyze.
+    data (DataFrame): Input pandas DataFrame containing the data.
     values (list or np.array): Discrete values at which to evaluate the negative binomial PMF.
     xlabel (str): Label for the x-axis of the plot. Default is "Feature".
     ylabel (str): Label for the y-axis of the plot. Default is "PMF".
     """
     
-    pmf = create_pmf(df, feature, name="Results")
+    pmf = create_pmf(data, name="Results")
     mean = pmf.mean()
     var = pmf.var()
     r = estimate_r(mean, var)

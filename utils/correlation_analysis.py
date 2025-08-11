@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import seaborn as sns
 from scipy.stats import spearmanr
 from utils.thinkstats import jitter, standardize
+
 
 def plot_scatter(val1, val2, figsize=(12,8), xlabel="Feature 1", ylabel="Feature 2"):
     plt.figure(figsize=figsize)
@@ -109,4 +111,55 @@ def plot_rank_correlation(vals1, vals2,
 
     print(f"Spearman's rank correlation coefficient: {spearmanr(vals1, vals2).statistic:.3f}")
     
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import pandas as pd
+
+def plot_top_correlations(data, target_feature, top_n=10, cmap=plt.cm.coolwarm, figsize=(9,6)):
+    """
+    Plot top correlated features with the target feature from raw data.
+
+    Parameters:
+    - data: pandas DataFrame with all features (including target)
+    - target_feature: string, name of target column
+    - top_n: int, number of top correlated features to show (default 10)
+    - cmap: matplotlib colormap
+    - figsize: tuple for figure size
+    """
+
+    correlations = data.corr()[target_feature].drop(target_feature)
+
+    top_features = correlations.abs().sort_values(ascending=False).head(top_n).index
+    top_correlations = correlations.loc[top_features]
     
+    df = pd.DataFrame({
+        'feature': top_correlations.index,
+        'correlation': top_correlations.values
+    })
+    
+    norm_values = np.abs(df['correlation']) / np.max(np.abs(df['correlation']))
+    colors = cmap(norm_values)
+    color_list = [colors[i] for i in range(len(colors))]
+    
+    plt.figure(figsize=figsize)
+    
+    sns.barplot(data=df, x='correlation', y='feature', palette=color_list, hue='feature', dodge=False, legend=False)
+    
+    plt.xlabel(f"Correlation with {target_feature}")
+    plt.title(f"Top {top_n} features correlated with {target_feature}")
+    plt.grid(axis='x', linestyle='--', alpha=0.7)
+    
+    xmin = df['correlation'].min() * 1.1 if df['correlation'].min() < 0 else 0
+    xmax = df['correlation'].max() * 1.1 if df['correlation'].max() > 0 else 0
+    plt.xlim(xmin, xmax)
+    
+    for i, v in enumerate(df['correlation']):
+        if v < 0:
+            plt.text(v - 0.02, i, f"{v:.2f}", color='black', va='center', ha='right')
+        else:
+            plt.text(v + 0.02, i, f"{v:.2f}", color='black', va='center', ha='left')
+    
+    sns.despine(left=True, bottom=True)
+    plt.tight_layout()
+    plt.show()
