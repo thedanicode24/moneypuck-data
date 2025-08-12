@@ -4,7 +4,7 @@ from empiricaldist import Pmf
 from utils.thinkstats import two_bar_plots
 from utils.distribution_analysis import create_pmf
 from scipy.special import gammaln
-from scipy.stats import nbinom
+from scipy.stats import nbinom, chisquare
 
 def mae(estimates, true_value):
     """
@@ -79,49 +79,37 @@ def estimate_r(mu, var):
     return mu**2 / (var - mu)
 
 def negative_binomial_pmf(k, mu, r):
-    """
-    Compute the probability mass function (PMF) of the negative binomial distribution.
-
-    Parameters:
-    k (int or np.array): Value(s) at which to compute the PMF.
-    mu (float): Mean of the distribution.
-    r (float): Number of successes until the experiment is stopped (dispersion parameter).
-
-    Returns:
-    float or np.array: PMF value(s) at the given k.
-    """
-
     log_coeff = gammaln(k + r) - gammaln(r) - gammaln(k + 1)
     log_p = r * np.log(r / (r + mu)) + k * np.log(mu / (r + mu))
     return np.exp(log_coeff + log_p)
 
-def plot_empirical_vs_nb_model(data, values, xlabel="Feature", ylabel="PMF"):
-    """
-    Plot the empirical PMF of a feature alongside the fitted negative binomial model.
+def plot_empirical_vs_negative_binomial_pmf(data, xlabel="Value", ylabel="PMF", figsize=(12,8)):
+    data = np.array(data)
+    data = data[data >= 0].astype(int)
 
-    Parameters:
-    data (DataFrame): Input pandas DataFrame containing the data.
-    values (list or np.array): Discrete values at which to evaluate the negative binomial PMF.
-    xlabel (str): Label for the x-axis of the plot. Default is "Feature".
-    ylabel (str): Label for the y-axis of the plot. Default is "PMF".
-    """
-    
-    pmf = create_pmf(data, name="Results")
-    mean = pmf.mean()
-    var = pmf.var()
-    r = estimate_r(mean, var)
+    mu = np.mean(data)
+    var = np.var(data, ddof=1)
+    r = estimate_r(mu, var)
 
-    vals = np.array(values)
-    neg = negative_binomial_pmf(vals, mean, r)
-    pmf_negbin = Pmf(neg, vals, name="Negative Binomial Model")
+    values, counts = np.unique(data, return_counts=True)
+    pmf_emp = counts / counts.sum()
 
-    plt.figure(figsize=(12,8))
-    two_bar_plots(pmf, pmf_negbin)
+    pmf_theor = negative_binomial_pmf(values, mu, r)
+
+    plt.figure(figsize=figsize)
+    plt.bar(values, pmf_emp, width=0.6, alpha=0.6, label='Empirical PMF', color='blue')
+    plt.plot(values, pmf_theor, 'o-', label='Negative Binomial PMF', color='red')
+    plt.title("Empirical vs Negative Binomial PMF")
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    plt.legend()
     plt.grid(True)
+    plt.show()
 
-    return mean, var, r
+    print(f"Estimated parameters: r={r:.4f}, mu={mu:.4f}, var={var:.4f}")
+
+    return values, pmf_theor, mu, r
+
 
 def simulate_mean_estimation_nb(mean, r, figsize=(12,8), num_reps=1000):
     """
@@ -199,3 +187,56 @@ def simulate_mean_estimation_nb(mean, r, figsize=(12,8), num_reps=1000):
     print(f"Mean Absolute Error (Mean): {mae(means, mean):.4f}")
     print(f"Mean Squared Error (Median): {mse(medians, mean):.4f}")
     print(f"Mean Absolute Error (Median): {mae(medians, mean):.4f}")
+
+
+###############################
+# Test
+###############################
+
+def chi_square_test(data, pmf_theor, values):
+    """
+    Perform a Chi-square goodness-of-fit test for discrete data.
+
+    Parameters:
+    -----------
+    data : array-like
+        Observed discrete data (integers).
+    pmf_theor : array-like
+        Theoretical probabilities (PMF values) corresponding to `values`.
+    values : array-like
+        Discrete values at which the theoretical PMF is evaluated.
+
+    Returns:
+    --------
+    chi2_stat : float
+        The Chi-square test statistic.
+    p_value : float
+        The p-value for the test.
+
+    Notes:
+    ------
+    - The length of `pmf_theor` and `values` must be the same.
+    - Observed data frequencies are calculated from `data`.
+    - Expected frequencies are computed as pmf_theor * total_observations.
+    - For valid results, expected frequencies should ideally be >= 5. 
+      If needed, group rare categories before applying the test.
+    """
+
+    data = np.array(data)
+    values = np.array(values)
+    pmf_theor = np.array(pmf_theor)
+
+    observed_counts = np.array([np.sum(data == v) for v in values])
+    total = observed_counts.sum()
+
+    expected_counts = pmf_theor * total
+    expected_counts = expected_counts * total / expected_counts.sum()
+
+    if np.any(expected_counts < 5):
+        print("Warning: Some expected frequencies are less than 5; consider grouping categories.")
+
+    chi2_stat, p_value = chisquare(f_obs=observed_counts, f_exp=expected_counts)
+
+    print(f"Chi-square statistic: {chi2_stat:.4f}, p-value: {p_value:.4f}")
+
+    #return chi2_stat, p_value
