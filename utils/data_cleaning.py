@@ -64,39 +64,29 @@ def save_column_names(df: pd.DataFrame, filename: str = "names_columns.txt") -> 
             f.write(col + '\n')
     print(f"Saved: {filename}")
 
-def drop_duplicate_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+def drop_duplicate_columns(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Checks for duplicate columns (by values) among the given list of columns.
     Drops all duplicate columns, keeping only the first occurrence of each set of identical columns.
 
     Parameters:
     -----------
     df : pd.DataFrame
         The input DataFrame.
-    columns : list of str
-        List of column names to check for duplicates.
 
     Returns:
     --------
     pd.DataFrame
         The modified DataFrame with duplicate columns dropped (keeping only the first of each duplicate group).
     """
-    to_drop = []
 
-    try:
-        for i, col_i in enumerate(columns):
-            if col_i in to_drop:
-                continue
-            for col_j in columns[i+1:]:
-                if col_j in to_drop:
-                    continue
-                if (df[col_i] == df[col_j]).all():
-                    to_drop.append(col_j)
-
-        df = df.drop(columns=to_drop)
-        print(f"Dropped columns: {to_drop}")
-        print(f"Number of features: {df.shape[1]}")
-        return df
-    except KeyError as e:
-        print(f"Error: {e}")
-        return df
+    duplicate_cols = df.columns[df.T.duplicated()]
+    
+    if len(duplicate_cols) > 0:
+        print("Removed duplicate columns:", list(duplicate_cols))
+    else:
+        print("No duplicate columns found.")
+    
+    df = df.loc[:, ~df.T.duplicated()]
+    print_df_size(df)
+    
+    return df
