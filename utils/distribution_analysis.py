@@ -68,6 +68,76 @@ def print_stats(data):
     else:
         print(f"Mode: {mode_values.values}")
 
+def plot_grouped_ftab(data, bin_size=0.5, figsize=(12,8), xlabel="Intervals", ylabel="Frequency"):
+    min_val = min(data)
+    max_val = max(data)
+    bins = []
+    frequencies = []
+
+    start = min_val
+    while start < max_val:
+        bins.append((start, start + bin_size))
+        start += bin_size
+
+    for b in bins:
+        count = sum(b[0] <= x < b[1] for x in data)
+        frequencies.append(count)
+
+    labels = [f"{interval[0]:.2f}-{interval[1]:.2f}" for interval in bins]
+
+    plt.figure(figsize=figsize)
+    plt.bar(labels, frequencies, width=0.6)
+    plt.xticks([])
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title("Grouped Frequency Table ")
+    plt.tight_layout()
+    plt.grid()
+    plt.show()
+
+
+def plot_two_grouped_ftabs(data1, data2, 
+                           bin_size=0.5, 
+                           figsize=(12,8), 
+                           xlabel="Intervals", 
+                           ylabel="Frequency",
+                           label1="Dataset 1",
+                           label2="Dataset 2"):
+    min_val = min(min(data1), min(data2))
+    max_val = max(max(data1), max(data2))
+
+    bins = []
+    start = min_val
+    while start < max_val:
+        bins.append((start, start + bin_size))
+        start += bin_size
+
+    def get_freq(data):
+        return [sum(b[0] <= x < b[1] for x in data) for b in bins]
+
+    freq1 = get_freq(data1)
+    freq2 = get_freq(data2)
+
+    labels = [f"{b[0]:.2f}-{b[1]:.2f}" for b in bins]
+    x = np.arange(len(bins))
+
+    width = 0.4
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.bar(x - width/2, freq1, width, label=label1)
+    ax.bar(x + width/2, freq2, width, label=label2)
+    ax.set_xticks([])
+    ax.set_xticklabels([])
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title('Comparison of Grouped Frequency Tables')
+    ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    plt.show()
+
+
+
 
 ###################################
 # Probability Mass Function
