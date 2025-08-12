@@ -2,8 +2,7 @@ import numpy as np
 from empiricaldist import FreqTab, Pmf, Cdf
 from utils.thinkstats import plot_kde, cohen_effect_size, two_bar_plots, bias, percentile_rank, median, iqr, quartile_skewness, Pdf, NormalPdf
 import matplotlib.pyplot as plt
-from scipy.stats import gaussian_kde
-
+from scipy.stats import gaussian_kde, skew, kurtosis
 ###############################
 # Frequency Table
 ###############################
@@ -95,6 +94,11 @@ def plot_grouped_ftab(data, bin_size=0.5, figsize=(12,8), xlabel="Intervals", yl
     plt.grid()
     plt.show()
 
+    print(f"Mean: {data.mean():.3f}")
+    print(f"Variance: {data.var():.3f}")
+    print(f"Standard deviation: {data.std(ddof=0):.3f}")
+    print(f"Skewness: {skew(data):.3f}")
+    print(f"Kurtosis: {kurtosis(data)+3:.3f}")
 
 def plot_two_grouped_ftabs(data1, data2, 
                            bin_size=0.5, 
