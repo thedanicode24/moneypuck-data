@@ -2,8 +2,7 @@ import numpy as np
 from empiricaldist import FreqTab, Pmf, Cdf
 from utils.thinkstats import plot_kde, cohen_effect_size, two_bar_plots, bias, percentile_rank, median, iqr, quartile_skewness, Pdf, NormalPdf
 import matplotlib.pyplot as plt
-from scipy.stats import gaussian_kde
-
+from scipy.stats import gaussian_kde, skew, kurtosis
 ###############################
 # Frequency Table
 ###############################
@@ -68,6 +67,81 @@ def print_stats(data):
     else:
         print(f"Mode: {mode_values.values}")
 
+def plot_grouped_ftab(data, bin_size=0.5, figsize=(12,8), xlabel="Intervals", ylabel="Frequency"):
+    min_val = min(data)
+    max_val = max(data)
+    bins = []
+    frequencies = []
+
+    start = min_val
+    while start < max_val:
+        bins.append((start, start + bin_size))
+        start += bin_size
+
+    for b in bins:
+        count = sum(b[0] <= x < b[1] for x in data)
+        frequencies.append(count)
+
+    labels = [f"{interval[0]:.2f}-{interval[1]:.2f}" for interval in bins]
+
+    plt.figure(figsize=figsize)
+    plt.bar(labels, frequencies, width=0.6)
+    plt.xticks([])
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title("Grouped Frequency Table ")
+    plt.tight_layout()
+    plt.grid()
+    plt.show()
+
+    print(f"Mean: {data.mean():.3f}")
+    print(f"Variance: {data.var():.3f}")
+    print(f"Standard deviation: {data.std(ddof=0):.3f}")
+    print(f"Skewness: {skew(data):.3f}")
+    print(f"Kurtosis: {kurtosis(data)+3:.3f}")
+
+def plot_two_grouped_ftabs(data1, data2, 
+                           bin_size=0.5, 
+                           figsize=(12,8), 
+                           xlabel="Intervals", 
+                           ylabel="Frequency",
+                           label1="Dataset 1",
+                           label2="Dataset 2"):
+    min_val = min(min(data1), min(data2))
+    max_val = max(max(data1), max(data2))
+
+    bins = []
+    start = min_val
+    while start < max_val:
+        bins.append((start, start + bin_size))
+        start += bin_size
+
+    def get_freq(data):
+        return [sum(b[0] <= x < b[1] for x in data) for b in bins]
+
+    freq1 = get_freq(data1)
+    freq2 = get_freq(data2)
+
+    labels = [f"{b[0]:.2f}-{b[1]:.2f}" for b in bins]
+    x = np.arange(len(bins))
+
+    width = 0.4
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.bar(x - width/2, freq1, width, label=label1)
+    ax.bar(x + width/2, freq2, width, label=label2)
+    ax.set_xticks([])
+    ax.set_xticklabels([])
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title('Comparison of Grouped Frequency Tables')
+    ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    plt.show()
+
+
+
 
 ###################################
 # Probability Mass Function
@@ -104,7 +178,8 @@ def plot_pmf(data, width=2, xlabel="Feature", ylabel="PMF", figsize=(12,8)):
 
     plt.figure(figsize=figsize)
     two_bar_plots(actual_pmf, observed_pmf, width=width)
-    plt.grid(True)
+    plt.title("Probability Mass Function")
+    plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
@@ -146,8 +221,9 @@ def plot_two_pmfs(values1, values2, label1="Name1", label2="Name2", xlabel="Feat
     pmf2 = Pmf.from_seq(values2, name=label2)
 
     plt.figure(figsize=figsize)
+    plt.title("Probability Mass Function")
     two_bar_plots(pmf1, pmf2)
-    plt.grid(True)
+    plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
@@ -170,6 +246,7 @@ def plot_diff_pmfs(values1, values2, label1="Name1", label2="Name2", xlabel="Fea
 
     diff = (pmf1-pmf2)*100
     plt.figure(figsize=figsize)
+    plt.title("Probability Mass Function - Percentage difference")
     diff.bar()
     plt.grid(True)
     plt.xlabel(xlabel)
@@ -240,7 +317,8 @@ def plot_cdf(ref, values, figsize=(12,8), label="Reference", xlabel="Feature", y
     cdf.step()
     plt.axvline(ref, ls=":", color="red", label=f"{label}: {ref:.2f}")
     plt.legend()
-    plt.grid(True)
+    plt.title("Cumulative Distribution Function")
+    plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
@@ -265,8 +343,9 @@ def plot_two_cdfs(values1, values2, label1="Name1", label2="Name2", xlabel="Feat
     plt.figure(figsize=figsize)
     cdf1.plot()
     cdf2.plot(alpha=0.5)
+    plt.title("Cumulative Distribution Function")
     plt.legend()
-    plt.grid(True)
+    plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 

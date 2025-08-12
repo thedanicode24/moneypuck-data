@@ -66,7 +66,6 @@ I_F_reboundxGoals
 I_F_xGoals_with_earned_rebounds
 I_F_xGoals_with_earned_rebounds_scoreAdjusted
 I_F_xGoals_with_earned_rebounds_scoreFlurryAdjusted
-I_F_shifts
 I_F_oZoneShiftStarts
 I_F_dZoneShiftStarts
 I_F_neutralZoneShiftStarts
@@ -75,10 +74,8 @@ I_F_oZoneShiftEnds
 I_F_dZoneShiftEnds
 I_F_neutralZoneShiftEnds
 I_F_flyShiftEnds
-faceoffsWon
 faceoffsLost
 timeOnBench
-penalityMinutes
 penalityMinutesDrawn
 penaltiesDrawn
 shotsBlockedByPlayer

@@ -163,3 +163,5 @@ def plot_top_correlations(data, target_feature, top_n=10, cmap=plt.cm.coolwarm, 
     sns.despine(left=True, bottom=True)
     plt.tight_layout()
     plt.show()
+
+    return top_features
