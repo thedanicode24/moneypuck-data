@@ -7,7 +7,6 @@ opposingTeam
 home_or_away
 gameDate
 position
-gameScore
 I_F_blockedShotAttempts_4on5
 I_F_blockedShotAttempts_5on4
 I_F_blockedShotAttempts_5on5
@@ -140,7 +139,6 @@ I_F_penalityMinutes_4on5
 I_F_penalityMinutes_5on4
 I_F_penalityMinutes_5on5
 I_F_penalityMinutes_all
-I_F_penalityMinutes_other
 I_F_playContinuedInZone_4on5
 I_F_playContinuedInZone_5on4
 I_F_playContinuedInZone_5on5
@@ -207,6 +205,11 @@ I_F_secondaryAssists_5on4
 I_F_secondaryAssists_5on5
 I_F_secondaryAssists_all
 I_F_secondaryAssists_other
+I_F_shifts_4on5
+I_F_shifts_5on4
+I_F_shifts_5on5
+I_F_shifts_all
+I_F_shifts_other
 I_F_shotAttempts_5on5
 I_F_shotAttempts_all
 I_F_shotsOnGoal_4on5
@@ -560,7 +563,6 @@ OnIce_F_xOnGoal_other
 corsiAgainstAfterShifts_4on5
 corsiAgainstAfterShifts_5on4
 corsiAgainstAfterShifts_5on5
-corsiAgainstAfterShifts_all
 corsiAgainstAfterShifts_other
 corsiForAfterShifts_4on5
 corsiForAfterShifts_5on4
@@ -577,6 +579,10 @@ fenwickAgainstAfterShifts_other
 fenwickForAfterShifts_5on4
 fenwickForAfterShifts_5on5
 fenwickForAfterShifts_other
+gameScore_4on5
+gameScore_5on4
+gameScore_5on5
+gameScore_other
 iceTimeRank_4on5
 iceTimeRank_5on4
 iceTimeRank_5on5
@@ -631,11 +637,6 @@ penaltiesDrawn_5on4
 penaltiesDrawn_5on5
 penaltiesDrawn_all
 penaltiesDrawn_other
-shifts_4on5
-shifts_5on4
-shifts_5on5
-shifts_all
-shifts_other
 shotsBlockedByPlayer_4on5
 shotsBlockedByPlayer_5on4
 shotsBlockedByPlayer_5on5

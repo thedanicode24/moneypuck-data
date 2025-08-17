@@ -90,3 +90,17 @@ def drop_duplicate_columns(df: pd.DataFrame) -> pd.DataFrame:
     print_df_size(df)
     
     return df
+
+def pivot_df(df, index_cols, pivot_col,):
+    value_cols = [col for col in df.columns if col not in index_cols + [pivot_col]]
+
+    df_pivot = df.pivot_table(
+        index=index_cols,
+        columns=pivot_col,
+        values=value_cols,
+        aggfunc="first"
+    ).reset_index()
+    
+    df_pivot.columns = ['_'.join([str(c) for c in col if c]) for col in df_pivot.columns.values]
+    
+    return df_pivot

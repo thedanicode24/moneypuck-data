@@ -69,7 +69,7 @@ def plot_empirical_vs_lognorm_cdf(data, bins=100, figsize=(12,8)):
 
     plt.figure(figsize=figsize)
     plt.plot(x_emp, cdf_emp, label='Empirical CDF', color='blue')
-    plt.plot(x_emp, cdf_lognorm, label='Theoretical Lognorma CDF', color='red', linestyle='--')
+    plt.plot(x_emp, cdf_lognorm, label='Theoretical Lognormal CDF', color='red', linestyle='--')
     plt.title("Empirical CDF vs Theoretical Lognormal CDF")
     plt.xlabel("Data values")
     plt.ylabel("CDF")
@@ -115,7 +115,6 @@ def plot_empirical_vs_weibull_cdf(data, bins=100, figsize=(12,8)):
 
     shape, loc, scale = weibull_min.fit(positive_data, floc=0)
 
-    # CDF empirica
     res = cumfreq(positive_data, numbins=bins)
     x_emp = np.linspace(min(positive_data), max(positive_data), bins)
     cdf_emp = res.cumcount / len(positive_data)
@@ -242,5 +241,5 @@ def kolmogorov_smirnov_test(data, distribution, params=None, epsilon=1e-6):
             raise ValueError("No distribution")
 
     ks_stat, ks_p = kstest(data, distribution, args=params)
-    print(f"KS test {distribution}: stat={ks_stat:.4f}, p-value={ks_p:.4f}")
+    print(f"KS test {distribution}: stat={ks_stat:.4f}, p-value={ks_p}")
     #return ks_stat, ks_p
