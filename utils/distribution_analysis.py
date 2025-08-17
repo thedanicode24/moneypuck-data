@@ -17,7 +17,7 @@ def plot_ftab(data, xlabel="Feature", figsize=(12,8)):
     figsize (tuple, optional): Dimension of the plot. Default is (12,8).
     """
     
-    print_stats(data)
+    print_stats_discrete(data)
     ftab = FreqTab.from_seq(data, name=xlabel)
     plt.figure(figsize=figsize)
     ftab.bar()
@@ -50,7 +50,7 @@ def plot_two_ftabs(df1, df2, label1="Name1", label2="Name2", figsize=(12,8), xla
     plt.ylabel("Frequency")
     plt.title("Frequency Table")
 
-def print_stats(data):
+def print_stats_discrete(data):
     """
     Print basic statistics (mean, variance, standard deviation, and mode) for a given feature.
 
@@ -67,33 +67,26 @@ def print_stats(data):
     else:
         print(f"Mode: {mode_values.values}")
 
-def plot_grouped_ftab(data, bin_size=0.5, figsize=(12,8), xlabel="Intervals", ylabel="Frequency"):
-    min_val = min(data)
-    max_val = max(data)
-    bins = []
-    frequencies = []
-
-    start = min_val
-    while start < max_val:
-        bins.append((start, start + bin_size))
-        start += bin_size
-
-    for b in bins:
-        count = sum(b[0] <= x < b[1] for x in data)
-        frequencies.append(count)
-
-    labels = [f"{interval[0]:.2f}-{interval[1]:.2f}" for interval in bins]
-
+def plot_grouped_ftab(data, bin_method='sturges', figsize=(12,8), xlabel="Intervals", ylabel="Frequency"):
+    bins = np.histogram_bin_edges(data, bins=bin_method)
+    frequencies, edges = np.histogram(data, bins=bins)
+    
+    labels = [f"{edges[i]:.2f}-{edges[i+1]:.2f}" for i in range(len(edges)-1)]
+    
     plt.figure(figsize=figsize)
     plt.bar(labels, frequencies, width=0.6)
-    plt.xticks([])
+    plt.xticks(rotation=45)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.title("Grouped Frequency Table ")
+    plt.title(f"Grouped Frequency Table")
     plt.tight_layout()
-    plt.grid()
+    plt.grid(axis='y')
     plt.show()
 
+    print_stats_continuous(data)
+
+
+def print_stats_continuous(data):
     print(f"Mean: {data.mean():.3f}")
     print(f"Variance: {data.var():.3f}")
     print(f"Standard deviation: {data.std(ddof=0):.3f}")

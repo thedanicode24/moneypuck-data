@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from empiricaldist import Pmf, Cdf
 from utils.distribution_analysis import create_cdf
-from scipy.stats import norm, shapiro, kstest, probplot, lognorm, cumfreq, gamma, weibull_min, beta, fisk
+from scipy.stats import norm, shapiro, kstest, probplot, lognorm, cumfreq, gamma, weibull_min, beta, fisk, cauchy, laplace, logistic
 
 #############################
 # Normal Distribution
@@ -43,10 +43,6 @@ def qq_plot_normal(data, figsize=(12,8)):
     plt.grid()
     plt.show()
 
-
-
-
-
 ######################################
 # Lognormal
 ###################################
@@ -74,7 +70,7 @@ def plot_empirical_vs_lognorm_cdf(data, bins=100, figsize=(12,8)):
     plt.xlabel("Data values")
     plt.ylabel("CDF")
     plt.legend()
-    plt.grid(True)
+    plt.grid()
     plt.show()
 
 
@@ -185,9 +181,85 @@ def plot_empirical_vs_loglogistic_cdf(data, bins=100, figsize=(12,8)):
     plt.xlabel("Data values")
     plt.ylabel("CDF")
     plt.legend()
+    plt.grid()
+    plt.show()
+
+#################################
+# Cauchy
+#################################
+
+def plot_empirical_vs_cauchy_cdf(data, bins=100, figsize=(12,8)):
+
+    loc = np.median(data)
+    scale = (np.percentile(data, 75) - np.percentile(data, 25)) / 2
+
+    res = cumfreq(data, numbins=bins)
+    x_emp = np.linspace(min(data), max(data), bins)
+    cdf_emp = res.cumcount / len(data)
+
+    cdf_cauchy = cauchy.cdf(x_emp, loc=loc, scale=scale)
+
+    plt.figure(figsize=figsize)
+    plt.plot(x_emp, cdf_emp, label='Empirical CDF', color='blue')
+    plt.plot(x_emp, cdf_cauchy, label='Theoretical Cauchy CDF', color='red', linestyle='--')
+    plt.title("Empirical CDF vs Theoretical Cauchy CDF")
+    plt.xlabel("Data values")
+    plt.ylabel("CDF")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+###################################
+# Laplace
+#################################
+
+def plot_empirical_vs_laplace_cdf(data, bins=100, figsize=(12,8)):
+    loc = np.median(data)
+    scale = np.mean(np.abs(data - loc))
+
+    res = cumfreq(data, numbins=bins)
+    x_emp = np.linspace(min(data), max(data), bins)
+    cdf_emp = res.cumcount / len(data)
+
+    cdf_laplace = laplace.cdf(x_emp, loc=loc, scale=scale)
+
+    plt.figure(figsize=figsize)
+    plt.plot(x_emp, cdf_emp, label='Empirical CDF', color='blue')
+    plt.plot(x_emp, cdf_laplace, label='Theoretical Laplace CDF', color='red', linestyle='--')
+    plt.title("Empirical CDF vs Theoretical Laplace CDF")
+    plt.xlabel("Data values")
+    plt.ylabel("CDF")
+    plt.legend()
     plt.grid(True)
     plt.show()
 
+###################################
+# Logistic
+##################################
+
+def plot_empirical_vs_logistic_cdf(data, bins=100, figsize=(12,8)):
+
+    # Stima dei parametri
+    loc = np.median(data)
+    scale = np.std(data) * np.sqrt(3) / np.pi  # parametro di scala
+
+    # CDF empirica
+    res = cumfreq(data, numbins=bins)
+    x_emp = np.linspace(min(data), max(data), bins)
+    cdf_emp = res.cumcount / len(data)
+
+    # CDF teorica logistica
+    cdf_logistic = logistic.cdf(x_emp, loc=loc, scale=scale)
+
+    plt.figure(figsize=figsize)
+    plt.plot(x_emp, cdf_emp, label='Empirical CDF', color='blue')
+    plt.plot(x_emp, cdf_logistic, label='Theoretical Logistic CDF', color='red', linestyle='--')
+    plt.title("Empirical CDF vs Theoretical Logistic CDF")
+    plt.xlabel("Data values")
+    plt.ylabel("CDF")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 #################################
 # Test
@@ -237,9 +309,21 @@ def kolmogorov_smirnov_test(data, distribution, params=None, epsilon=1e-6):
             shape, loc, scale = fisk.fit(positive_data, floc=0)
             params = (shape, 0, scale)
             data = positive_data
+        elif distribution == 'logistic':
+            loc = np.median(data)
+            scale = np.std(data, ddof=1) * np.sqrt(3) / np.pi
+            params = (loc, scale)
+        elif distribution == 'cauchy':
+            loc = np.median(data)
+            scale = (np.percentile(data, 75) - np.percentile(data, 25)) / 2
+            params = (loc, scale)
+        elif distribution == 'laplace':
+            loc = np.median(data)
+            scale = np.mean(np.abs(data - loc))
+            params = (loc, scale)
         else:
             raise ValueError("No distribution")
 
     ks_stat, ks_p = kstest(data, distribution, args=params)
     print(f"KS test {distribution}: stat={ks_stat:.4f}, p-value={ks_p}")
-    #return ks_stat, ks_p
+    return ks_stat, ks_p
