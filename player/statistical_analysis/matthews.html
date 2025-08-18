@@ -188,9 +188,8 @@ Attaching package: 'dplyr'</code></pre>
 <pre><code>Kurtosis:        5.99751 </code></pre>
 </div>
 </div>
-</section>
-<section id="grouped-frequency-table" class="level2">
-<h2 class="anchored" data-anchor-id="grouped-frequency-table">Grouped Frequency Table</h2>
+<section id="grouped-frequency-table" class="level3">
+<h3 class="anchored" data-anchor-id="grouped-frequency-table">Grouped Frequency Table</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>min <span class="ot">&lt;-</span> <span class="fu">floor</span>(<span class="fu">min</span>(df<span class="sc">$</span>gameScore))</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>max <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(<span class="fu">max</span>(df<span class="sc">$</span>gameScore))</span>
@@ -210,8 +209,8 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 </div>
 </section>
-<section id="cumulative-distributive-function" class="level2">
-<h2 class="anchored" data-anchor-id="cumulative-distributive-function">Cumulative Distributive Function</h2>
+<section id="cumulative-distributive-function" class="level3">
+<h3 class="anchored" data-anchor-id="cumulative-distributive-function">Cumulative Distributive Function</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggplot2")</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -238,8 +237,8 @@ Attaching package: 'ggplot2'</code></pre>
 </div>
 </div>
 </section>
-<section id="probability-density-function" class="level2">
-<h2 class="anchored" data-anchor-id="probability-density-function">Probability Density Function</h2>
+<section id="probability-density-function" class="level3">
+<h3 class="anchored" data-anchor-id="probability-density-function">Probability Density Function</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -255,8 +254,8 @@ Attaching package: 'ggplot2'</code></pre>
 </div>
 </div>
 </section>
-<section id="modeling-distribution" class="level2">
-<h2 class="anchored" data-anchor-id="modeling-distribution">Modeling Distribution</h2>
+<section id="modeling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="modeling-distribution">Modeling Distribution</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>cdf_emp <span class="ot">&lt;-</span> <span class="fu">ecdf</span>(df<span class="sc">$</span>gameScore)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>x_vals <span class="ot">&lt;-</span> <span class="fu">sort</span>(df<span class="sc">$</span>gameScore)</span>
@@ -379,6 +378,7 @@ W = 0.49514, p-value = 3.033e-06</code></pre>
 </div>
 </div>
 </div>
+</section>
 </section>
 
 </main>

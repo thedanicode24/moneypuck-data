@@ -80,7 +80,7 @@ barplot(freq, main = "Grouped Frequency Table",
 grid()
 ```
 
-## Cumulative Distributive Function
+### Cumulative Distributive Function
 
 ```{r}
 # install.packages("ggplot2")
@@ -92,7 +92,7 @@ ggplot(df, aes(x=gameScore)) +
   labs(title="Game Score - Empirical CDF", x ="Game Score", y ="CDF")
 ```
 
-## Probability Density Function
+### Probability Density Function
 
 ```{r}
 library(ggplot2)
@@ -102,7 +102,7 @@ ggplot(df, aes(x=gameScore)) +
   labs(title="Kernel Density Estimate", x="gameScore", y="Density")
 ```
 
-## Modeling Distribution
+### Modeling Distribution
 
 ```{r}
 cdf_emp <- ecdf(df$gameScore)
