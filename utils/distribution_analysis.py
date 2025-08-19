@@ -83,8 +83,6 @@ def plot_grouped_ftab(data, bin_method='sturges', figsize=(12,8), xlabel="Interv
     plt.grid(axis='y')
     plt.show()
 
-    print_stats_continuous(data)
-
 
 def print_stats_continuous(data):
     print(f"Mean: {data.mean():.3f}")
@@ -305,7 +303,6 @@ def plot_cdf(ref, values, figsize=(12,8), label="Reference", xlabel="Feature", y
     """
     cdf = create_cdf(values)
 
-    print_percentile_stats(cdf)
     plt.figure(figsize=figsize)
     cdf.step()
     plt.axvline(ref, ls=":", color="red", label=f"{label}: {ref:.2f}")
