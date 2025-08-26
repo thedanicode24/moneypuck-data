@@ -1,179 +1,143 @@
 ---
-title: "Auston Matthews - Game Score"
+title: "Auston Matthews"
 format: html
 editor: visual
 ---
 
-## Import dataset
+# Part 01 - Exploring data
+
+## 1.1 - Loading packages
+
+```{r}
+library(tidyverse)
+library(reshape2)
+library(sqldf)
+library(patchwork)
+```
+
+## 1.2 - Importing data
 
 ```{r}
 url = "https://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/skaters/8479318.csv"
 df <- read.csv(url)
-# head(df)
 ```
 
-## Read the data
+## 1.3 - Wrangling data
+
+### Removing variables
 
 ```{r}
-# install.packages("psych")
-library(psych)
-# describe(df)
+df_all <- df[df$situation=="all",]
+df_selected <- df_all[,c("gameDate", "opposingTeam", "I_F_goals", "I_F_points", "icetime", "gameScore")]
 ```
 
-## Data cleaning
+### Removing observations
 
 ```{r}
-# install.packages("dplyr")
-# install.packages("tidyr")
-library(dplyr)
-library(tidyr)
-
-index_cols <- c("playerId", "season", "name", "gameId", "playerTeam", 
-                "opposingTeam", "home_or_away", "gameDate", "position")
-
-pivot_col <- "situation"
-value_cols <- setdiff(colnames(df), c(index_cols, pivot_col))
-
-df <- df %>%
-  pivot_wider(
-    id_cols = all_of(index_cols),
-    names_from = all_of(pivot_col),
-    values_from = all_of(value_cols),
-    values_fn = list
-  )
-
-df <- df %>%
-  mutate(across(everything(), ~ if(is.list(.)) sapply(., `[`, 1) else .))
-
-df <- df %>%
-  rename(gameScore = gameScore_all)
+any(is.na(df_selected))
 ```
 
-## Univariate Analysis
+### Viewing data
 
 ```{r}
-data<-df$gameScore
-summary(data)
+head(df_selected)
 ```
 
-```{r}
-# install.packages("moments")
-library(moments)
+### Converting variables types
 
-cat("Variance: \t\t", var(df$gameScore), "\n")
-cat("Standard deviation\t", sd(df$gameScore), "\n")
-cat("Skewness: \t\t", skewness(df$gameScore), "\n")
-cat("Kurtosis: \t\t", kurtosis(df$gameScore)+3, "\n")
+```{r}
+
 ```
 
-### Grouped Frequency Table
+### Creating derived variables
 
 ```{r}
-min <- floor(min(df$gameScore))
-max <- ceiling(max(df$gameScore))
-num_bins = ceiling(sqrt(nrow(df))) # square root rule
-breaks <- seq(min, max+1, length.out=num_bins)
-df$gameScore_cat <- cut(df$gameScore, breaks=breaks, right=FALSE)
-freq <- table(df$gameScore_cat)
-barplot(freq, main = "Grouped Frequency Table", 
-        xlab = "Game Score", ylab = "Number of games", col="skyblue")
-grid()
+
 ```
 
-### Cumulative Distributive Function
+## 1.4 - Variable breakdown
 
 ```{r}
-# install.packages("ggplot2")
-library(ggplot2)
-cdf_fun <- ecdf(df$gameScore)
-cdf_values <- cdf_fun(df$gameScore)
-ggplot(df, aes(x=gameScore)) +
-  stat_ecdf(geom="step") +
-  labs(title="Game Score - Empirical CDF", x ="Game Score", y ="CDF")
+
 ```
 
-### Probability Density Function
+## 1.5 - Exploratory data analysys
+
+### Converting basic statistics 
 
 ```{r}
-library(ggplot2)
-
-ggplot(df, aes(x=gameScore)) +
-  geom_density(fill="lightblue", color="blue") +
-  labs(title="Kernel Density Estimate", x="gameScore", y="Density")
+summary(df_selected)
+sd(df_selected$I_F_goals)
+sd(df_selected$I_F_points)
+sd(df_selected$icetime)
+sd(df_selected$gameScore)
 ```
 
-### Modeling Distribution
+### Returning data
 
 ```{r}
-cdf_emp <- ecdf(df$gameScore)
-x_vals <- sort(df$gameScore)
-cdf_norm <- pnorm(x_vals, mean=mean(df$gameScore), sd=sd(df$gameScore))
+sqldf("SELECT min(gameScore), gameDate, opposingTeam FROM df_selected")
+sqldf("SELECT max(gameScore), gameDate, opposingTeam FROM df_selected")
+sqldf("SELECT max(I_F_goals), gameDate, opposingTeam FROM df_selected")
+sqldf("SELECT max(I_F_points), gameDate, opposingTeam FROM df_selected")
+```
 
-plot(x_vals, cdf_emp(x_vals), type="s", col="blue", main="Empirical CDF vs Normal",
-     xlab="Game Score", ylab="CDF")
-lines(x_vals, cdf_norm, col="red", lwd=2)
-legend("topleft", legend=c("Empirical CDF","Normal"), col=c("blue","red"), lwd=c(1,2))
-grid()
+### Computing and visualizing frequency distributions
+
+```{r}
+p_scores <- ggplot(df_selected, aes(x=gameScore)) +
+  geom_histogram(fill="royalblue3", color="royalblue3", bins=10) +
+  labs(title = "Game Score", 
+       subtitle = "Career", 
+       x = "Game Score",
+       y = "Frequency") +
+  theme(plot.title=element_text(face="bold"))
+
+p_goals <- ggplot(df_selected, aes(x=I_F_goals)) +
+  geom_histogram(fill="red3", color="red3", bins=5) +
+  labs(title = "Goals", 
+       subtitle = "Career", 
+       x = "Goals",
+       y = "Frequency") +
+  theme(plot.title=element_text(face="bold")) 
+
+p_points <- ggplot(df_selected, aes(x=I_F_points)) +
+  geom_histogram(fill="springgreen3", color="springgreen3", bins=8) +
+  labs(title = "Points", 
+       subtitle = "Career", 
+       x = "Game Score",
+       y = "Frequency") +
+  theme(plot.title=element_text(face="bold")) 
+
+print(p_scores)
+print(p_goals)
+print(p_points)
+                   
 ```
 
 ```{r}
-shapiro.test(df$gameScore)
+sqldf("SELECT COUNT(*) FROM df_selected WHERE gameScore>=0")
+sqldf("SELECT COUNT(*) FROM df_selected WHERE gameScore<0")
 ```
 
 ```{r}
-# install.packages("nortest")
-library(nortest)
-ad.test(df$gameScore)
+
 ```
 
+### Computing and visualizing correlations
+
 ```{r}
-library(nortest)
-lillie.test(df$gameScore)
+
 ```
 
+### Computing and visualizing means and medians
+
 ```{r}
-cvm.test(df$gameScore)
+
 ```
 
-```{r}
-cdf_emp <- ecdf(df$gameScore)
-x_vals <- sort(df$gameScore)
-loc <- median(df$gameScore)
-sc <- IQR(df$gameScore)/2
-cdf_cauchy <- pcauchy(x_vals, location = loc, scale = sc)
-plot(x_vals, cdf_emp(x_vals), type="s", col="blue", main="Empirical CDF vs Cauchy",
-     xlab="Game Score", ylab="CDF")
-lines(x_vals, cdf_cauchy, col="red", lwd=2)
-legend("topleft", legend=c("Empirical CDF","Cauchy"), col=c("blue","red"), lwd=c(1,2))
-grid()
-```
+## 1.6 - Writing data
 
 ```{r}
-# install.packages("extraDistr")
-library(extraDistr)
 
-cdf_emp <- ecdf(df$gameScore)
-x_vals <- sort(df$gameScore)
-loc <- median(df$gameScore)
-sc <- IQR(df$gameScore)/2
-cdf_laplace <- plaplace(x_vals, m=loc, s=sc)
-plot(x_vals, cdf_emp(x_vals), type="s", col="blue", main="Empirical CDF vs Laplace",
-     xlab="Game Score", ylab="CDF")
-lines(x_vals, cdf_laplace, col="red", lwd=2)
-legend("topleft", legend=c("Empirical CDF","Laplace"), col=c("blue","red"), lwd=c(1,2))
-grid()
-```
-
-```{r}
-cdf_emp <- ecdf(df$gameScore)
-x_vals <- sort(df$gameScore)
-loc <- median(df$gameScore)
-sc <- IQR(df$gameScore)/1.349
-cdf_logistic <- plogis(x_vals, location=loc, scale=sc)
-
-plot(x_vals, cdf_emp(x_vals), type="s", col="blue", main="Empirical CDF vs Logistic",
-     xlab="Game Score", ylab="CDF")
-lines(x_vals, cdf_logistic, col="red", lwd=2)
-legend("topleft", legend=c("Empirical CDF","Logistic"), col=c("blue","red"), lwd=c(1,2))
-grid()
 ```
