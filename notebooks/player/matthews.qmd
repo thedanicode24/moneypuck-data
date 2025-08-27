@@ -25,30 +25,26 @@ df <- read.csv(url)
 ### 1. Removing variables
 
 ```{r}
-df_all <- df[df$situation=="all",]
-df_pp <- df[df$situation=="5on4",]
-df_sh <- df[df$situation=="4on5",]
-df_full <- df[df$situation=="5on5",]
-df_other <- df[df$situation=="other",]
-df_selected <- df_all[,c("gameDate", "opposingTeam", "I_F_goals", "I_F_points", "icetime", "gameScore")]
+
 ```
 
 ### 2. Removing observations
 
 ```{r}
-any(is.na(df_selected))
+any(is.na(df))
 ```
 
 ### 3. Viewing data
 
 ```{r}
-head(df_selected)
+# head(df)
 ```
 
 ### 4. Converting variables types
 
 ```{r}
 df$season <- as.factor(df$season)
+df$opposingTeam <- as.factor(df$opposingTeam)
 ```
 
 ### 5. Creating derived variables
@@ -90,7 +86,7 @@ situations <- unique(df$situation)
 for (s in situations) {
   subset_df = subset(df, situation==s)
   p_score <- ggplot(subset_df, aes(x=gameScore)) +
-    geom_histogram(fill="royalblue3", color="black", bins=10) +
+    geom_histogram(fill="royalblue3", color="black", bins=20) +
     labs(title = "Game Score - Distribution by Situation",
          subtitle=paste("Situation:", s),
          x = "Game Score",
@@ -145,6 +141,25 @@ for (s in situations) {
     M = median(gameScore),
     MAX = max(gameScore)) -> tibble
   print(tibble)
+}
+```
+
+```{r}
+situations <- unique(df$situation)
+
+for (s in situations) {
+  subset_df = subset(df, situation==s)
+  bp_score <- ggplot(subset_df, aes(x=opposingTeam, y=gameScore)) +
+    geom_boxplot(fill="blue4", color="dodgerblue") +
+    labs(title = "Game Score - Distribution by Opposing Team in each Situation",
+       subtitle=paste("Situation:", s),
+       x = "Situation",
+       y = "Game Score") +
+    theme(plot.title = element_text(face="bold")) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    stat_summary(fun=mean, geom="point", shape=10, 
+                 size=5, color="white", fill="white")
+  print(bp_score)
 }
 ```
 
