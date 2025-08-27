@@ -1,12 +1,10 @@
 ---
-title: "Auston Matthews"
+title: "Exploring data"
 format: html
 editor: visual
 ---
 
-# Part 01 - Exploring data
-
-## 1.1 - Loading packages
+## Loading packages
 
 ```{r}
 library(tidyverse)
@@ -15,55 +13,57 @@ library(sqldf)
 library(patchwork)
 ```
 
-## 1.2 - Importing data
+## Importing data
 
 ```{r}
 url = "https://moneypuck.com/moneypuck/playerData/careers/gameByGame/regular/skaters/8479318.csv"
 df <- read.csv(url)
 ```
 
-## 1.3 - Wrangling data
+## Wrangling data
 
-### Removing variables
+### 1. Removing variables
 
 ```{r}
 df_all <- df[df$situation=="all",]
+df_pp <- df[df$situation=="5on4",]
+df_sh <- df[df$situation=="4on5",]
+df_full <- df[df$situation=="5on5",]
+df_other <- df[df$situation=="other",]
 df_selected <- df_all[,c("gameDate", "opposingTeam", "I_F_goals", "I_F_points", "icetime", "gameScore")]
 ```
 
-### Removing observations
+### 2. Removing observations
 
 ```{r}
 any(is.na(df_selected))
 ```
 
-### Viewing data
+### 3. Viewing data
 
 ```{r}
 head(df_selected)
 ```
 
-### Converting variables types
+### 4. Converting variables types
 
 ```{r}
-
+df$season <- as.factor(df$season)
 ```
 
-### Creating derived variables
+### 5. Creating derived variables
 
 ```{r}
-
 ```
 
-## 1.4 - Variable breakdown
+## Variable breakdown
 
 ```{r}
-
 ```
 
-## 1.5 - Exploratory data analysys
+## Exploratory data analysis
 
-### Converting basic statistics 
+### 1. Basic statistics
 
 ```{r}
 summary(df_selected)
@@ -73,7 +73,7 @@ sd(df_selected$icetime)
 sd(df_selected$gameScore)
 ```
 
-### Returning data
+### 2. Returning data
 
 ```{r}
 sqldf("SELECT min(gameScore), gameDate, opposingTeam FROM df_selected")
@@ -82,62 +82,82 @@ sqldf("SELECT max(I_F_goals), gameDate, opposingTeam FROM df_selected")
 sqldf("SELECT max(I_F_points), gameDate, opposingTeam FROM df_selected")
 ```
 
-### Computing and visualizing frequency distributions
+### 3. Computing and visualizing frequency distributions
 
 ```{r}
-p_scores <- ggplot(df_selected, aes(x=gameScore)) +
-  geom_histogram(fill="royalblue3", color="royalblue3", bins=10) +
-  labs(title = "Game Score", 
-       subtitle = "Career", 
-       x = "Game Score",
-       y = "Frequency") +
-  theme(plot.title=element_text(face="bold"))
+situations <- unique(df$situation)
 
-p_goals <- ggplot(df_selected, aes(x=I_F_goals)) +
-  geom_histogram(fill="red3", color="red3", bins=5) +
-  labs(title = "Goals", 
-       subtitle = "Career", 
-       x = "Goals",
-       y = "Frequency") +
-  theme(plot.title=element_text(face="bold")) 
-
-p_points <- ggplot(df_selected, aes(x=I_F_points)) +
-  geom_histogram(fill="springgreen3", color="springgreen3", bins=8) +
-  labs(title = "Points", 
-       subtitle = "Career", 
-       x = "Game Score",
-       y = "Frequency") +
-  theme(plot.title=element_text(face="bold")) 
-
-print(p_scores)
-print(p_goals)
-print(p_points)
-                   
+for (s in situations) {
+  subset_df = subset(df, situation==s)
+  p_score <- ggplot(subset_df, aes(x=gameScore)) +
+    geom_histogram(fill="royalblue3", color="black", bins=10) +
+    labs(title = "Game Score - Distribution by Situation",
+         subtitle=paste("Situation:", s),
+         x = "Game Score",
+         y="Number of games") +
+    theme(plot.title = element_text(face="bold"))
+  print(p_score)
+}
 ```
 
 ```{r}
-sqldf("SELECT COUNT(*) FROM df_selected WHERE gameScore>=0")
-sqldf("SELECT COUNT(*) FROM df_selected WHERE gameScore<0")
+bp_score <- ggplot(df, aes(x = situation, y = gameScore)) +
+  geom_boxplot(fill="red3", color="red1") +
+  labs(title = "Game Score Distribution by Situation",
+       subtitle=paste("Situation:", s),
+       x = "Situation",
+       y = "Game Score") +
+  theme(plot.title = element_text(face="bold")) + 
+  stat_summary(fun=mean, geom="point", shape=20, 
+               size=5, color="white", fill="white")
+print(bp_score)
 ```
+
+```{r}
+situations <- unique(df$situation)
+
+for (s in situations) {
+  subset_df = subset(df, situation==s)
+  bp_score <- ggplot(subset_df, aes(x=season, y=gameScore)) +
+    geom_boxplot(fill="dodgerblue4", color="dodgerblue") +
+    labs(title = "Game Score - Distribution by Situation",
+       subtitle=paste("Situation:", s),
+       x = "Situation",
+       y = "Game Score") +
+    theme(plot.title = element_text(face="bold")) + 
+    stat_summary(fun=mean, geom="point", shape=20, 
+                 size=5, color="white", fill="white")
+  print(bp_score)
+}
+```
+
+```{r}
+situations <- unique(df$situation)
+
+for (s in situations) {
+  subset_df = subset(df, situation==s)
+  subset_df %>%
+  summarize(Situation = s,
+    MIN = min(gameScore),
+    LQ = quantile(gameScore, .25),
+    UQ = quantile(gameScore, .75),
+    AVG = mean(gameScore),
+    M = median(gameScore),
+    MAX = max(gameScore)) -> tibble
+  print(tibble)
+}
+```
+
+### 4. Computing and visualizing correlations
 
 ```{r}
 
 ```
 
-### Computing and visualizing correlations
+### 5. Computing and visualizing means and medians
 
 ```{r}
 
 ```
 
-### Computing and visualizing means and medians
-
-```{r}
-
-```
-
-## 1.6 - Writing data
-
-```{r}
-
-```
+## 
