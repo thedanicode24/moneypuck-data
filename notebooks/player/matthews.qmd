@@ -45,6 +45,8 @@ any(is.na(df))
 ```{r}
 df$season <- as.factor(df$season)
 df$opposingTeam <- as.factor(df$opposingTeam)
+df$home_or_away <- as.factor(df$home_or_away)
+df$situation <- as.factor(df$situation)
 ```
 
 ### 5. Creating derived variables
@@ -62,11 +64,10 @@ df$opposingTeam <- as.factor(df$opposingTeam)
 ### 1. Basic statistics
 
 ```{r}
-summary(df_selected)
-sd(df_selected$I_F_goals)
-sd(df_selected$I_F_points)
-sd(df_selected$icetime)
-sd(df_selected$gameScore)
+sd(df$I_F_goals)
+sd(df$I_F_points)
+sd(df$icetime)
+sd(df$gameScore)
 ```
 
 ### 2. Returning data
@@ -172,7 +173,52 @@ for (s in situations) {
 ### 5. Computing and visualizing means and medians
 
 ```{r}
+df %>%
+  group_by(situation, home_or_away) %>%
+  summarize(meanGS = mean(gameScore), medianGS = median(gameScore)) -> tibble
+new_labels <- c("0"="HOME", "1"="AWAY")
 
+avg_score <- ggplot(tibble, aes(x=situation, y=meanGS)) +
+  geom_bar(stat="identity", width=.5, fill="slateblue4") +
+  labs(title="Average Game Score (Home/Away)", 
+       x = "Home/Away",
+       y = "Average Game Score") +
+  geom_text(aes(label=round(meanGS,2)), vjust=-0.3, position=position_dodge(0.5), size=3) +
+  ylim(-1,3) +
+  theme(plot.title = element_text(face="bold")) +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  facet_wrap(~home_or_away, labeller=labeller(new_labels), ncol=1)
+  
+median_score <- ggplot(tibble, aes(x=situation, y=medianGS)) +
+  geom_bar(stat="identity", width=.5, fill="sienna1") +
+  labs(title="Median Game Score (Home/Away)", 
+       x = "Home/Away",
+       y = "Median Game Score") +
+  geom_text(aes(label=round(medianGS,2)), vjust=-0.3, position=position_dodge(0.5), size=3) +
+  ylim(-1,3) +
+  theme(plot.title = element_text(face="bold")) +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  facet_wrap(~home_or_away, labeller=labeller(new_labels), ncol=1)
+  
+print(avg_score + median_score + plot_layout(ncol=2))
 ```
 
-## 
+```{r}
+df %>%
+  group_by(situation, home_or_away) %>%
+  summarize(meanG = mean(I_F_goals)) -> tibble_goals
+new_labels <- c("0"="HOME", "1"="AWAY")
+
+avg_goals <- ggplot(tibble_goals, aes(x=situation, y=meanG)) +
+  geom_bar(stat="identity", width=.5, fill="skyblue4") +
+  labs(title="Average Goals (Home/Away)", 
+       x = "Situation",
+       y = "Average Goals") +
+  geom_text(aes(label=round(meanG,2)), vjust=-0.3, position=position_dodge(0.5), size=3) +
+  ylim(0,1.5) +
+  theme(plot.title = element_text(face="bold")) +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  facet_wrap(~home_or_away, labeller=labeller(new_labels))
+
+print(avg_goals)
+```
