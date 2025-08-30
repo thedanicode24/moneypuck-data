@@ -11,6 +11,7 @@ library(tidyverse)
 library(reshape2)
 library(sqldf)
 library(patchwork)
+library(scales)
 ```
 
 ## Importing data
@@ -101,7 +102,6 @@ for (s in situations) {
 bp_score <- ggplot(df, aes(x = situation, y = gameScore)) +
   geom_boxplot(fill="red3", color="red1") +
   labs(title = "Game Score Distribution by Situation",
-       subtitle=paste("Situation:", s),
        x = "Situation",
        y = "Game Score") +
   theme(plot.title = element_text(face="bold")) + 
@@ -164,6 +164,18 @@ for (s in situations) {
 }
 ```
 
+```{r}
+icetime_score <- ggplot(df, aes(x = situation, y = icetime)) +
+  geom_boxplot(fill="darkslategray4", color="darkslategray3") +
+  labs(title = "Icetime Distribution by Situation",
+       x = "Situation",
+       y = "Icetime") +
+  theme(plot.title = element_text(face="bold")) + 
+  stat_summary(fun=mean, geom="point", shape=20, 
+               size=5, color="white", fill="white")
+print(icetime_score)
+```
+
 ### 4. Computing and visualizing correlations
 
 ```{r}
@@ -221,4 +233,32 @@ avg_goals <- ggplot(tibble_goals, aes(x=situation, y=meanG)) +
   facet_wrap(~home_or_away, labeller=labeller(new_labels))
 
 print(avg_goals)
+```
+
+## Probability Density Function
+
+```{r}
+
+situations <- unique(df$situation)
+
+for (s in situations) {
+  subset_df = subset(df, situation==s)
+  pdf <- ggplot(subset_df, aes(x=gameScore)) +
+  geom_density(alpha=.3, fill="salmon") +
+  geom_vline(aes(xintercept=mean(gameScore, na.rm=TRUE)),
+             color="red", linetype="longdash", linewidth=.8) +
+  geom_vline(aes(xintercept=median(gameScore, na.rm=TRUE)),
+             color="blue", linetype="longdash", linewidth=.8) +
+  labs(title="Game Score Distribution", 
+       subtitle=paste("Situation: ",s),
+       x="Game Score",
+       y="Density") +
+  scale_x_continuous(labels=comma) +
+  theme(plot.title=element_text(face="bold")) +
+  annotate("text", x=mean(subset_df$gameScore)+0.1, y=0.3, 
+           label="Mean", color="black", size=4, fontface="bold", angle=90) +
+  annotate("text", x=median(subset_df$gameScore)-0.1, y=0.3, 
+           label="Median", color="black", size=4, fontface="bold", angle=90)
+  print(pdf)
+}
 ```
