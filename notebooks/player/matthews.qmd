@@ -227,7 +227,7 @@ avg_goals <- ggplot(tibble_goals, aes(x=situation, y=meanG)) +
        x = "Situation",
        y = "Average Goals") +
   geom_text(aes(label=round(meanG,2)), vjust=-0.3, position=position_dodge(0.5), size=3) +
-  ylim(0,1.5) +
+  ylim(0,1) +
   theme(plot.title = element_text(face="bold")) +
   theme(axis.text.x=element_text(angle=45, hjust=1)) +
   facet_wrap(~home_or_away, labeller=labeller(new_labels))
@@ -238,7 +238,6 @@ print(avg_goals)
 ## Probability Density Function
 
 ```{r}
-
 situations <- unique(df$situation)
 
 for (s in situations) {
@@ -260,5 +259,23 @@ for (s in situations) {
   annotate("text", x=median(subset_df$gameScore)-0.1, y=0.3, 
            label="Median", color="black", size=4, fontface="bold", angle=90)
   print(pdf)
+}
+```
+
+```{r}
+situations <- unique(df$situation)
+
+for (s in situations) {
+  subset_df = subset(df, situation==s)
+  corr <- ggplot(subset_df, aes(x=icetime, y=gameScore)) +
+    geom_point(size=1) +
+    labs(title="Icetime vs Game Score",
+         subtitle=paste("Distribution:",s), 
+         x="Icetime",
+         y="Game Score") +
+    geom_smooth(method=lm, se=FALSE) +
+    scale_x_continuous(label=scales::comma) +
+    theme(plot.title=element_text(face="bold"))
+  print(corr)
 }
 ```
