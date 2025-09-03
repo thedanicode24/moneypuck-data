@@ -179,7 +179,22 @@ print(icetime_score)
 ### 4. Computing and visualizing correlations
 
 ```{r}
+library(reshape2)
+cor_df <- df %>% select(I_F_goals, I_F_points, icetime, gameScore)
+correlations <- cor(cor_df)
+cor_table <- melt(correlations)
 
+p_corr <- ggplot(data=cor_table, aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_gradient2(midpoint=0, mid="grey84", limits=c(-1,1)) +
+  labs(title="Correlation Matrix",
+       subtitle="Correlation coefficients between game score and other variables",
+       x="", y="", fill="Correlation\nCoefficient") +
+  theme(plot.title=element_text(face="bold"),
+        legend.title=element_text(face="bold", color="brown", size=10)) +
+  geom_text(aes(label=round(value,2)), color="black", fontface="bold", size=5)
+
+print(p_corr)
 ```
 
 ### 5. Computing and visualizing means and medians
@@ -277,5 +292,6 @@ for (s in situations) {
     scale_x_continuous(label=scales::comma) +
     theme(plot.title=element_text(face="bold"))
   print(corr)
+
 }
 ```
